@@ -177,9 +177,10 @@
     // הכתובת שמקבלים אחרי Deploy ב-Apps Script (נגמרת ב-/exec)
     scriptUrl: 'https://script.google.com/macros/s/AKfycbyV2BAO9fzSXQZCQuPR39qiSjyKm1rH2XspfbrRVDG1QuXZqznqPJBjRzqghfKwr9OezQ/exec',
     title: 'הרשמה לטורניר פאדל',
-    date: 'יום שישי, 20.11.2026',
-    location: 'מועדון הפאדל',
-    price: '200 ₪ לזוג',
+    date: 'יום ראשון, 8.11.2026',
+    time: '17:00–24:00',
+    location: 'קניון רננים, קומה 5 (על הגג)',
+    price: '200 ₪ לשחקן',
     categories: ['מתחילים', 'בינוניים', 'מתקדמים'],
   };
   // ===============================
@@ -189,7 +190,7 @@
 
   document.title = CONFIG.title;
   $('title').textContent = CONFIG.title;
-  for (const [label, value] of [['תאריך', CONFIG.date], ['מקום', CONFIG.location], ['מחיר', CONFIG.price]]) {
+  for (const [label, value] of [['תאריך', CONFIG.date], ['שעות', CONFIG.time], ['מקום', CONFIG.location], ['מחיר', CONFIG.price]]) {
     if (!value) continue;
     const span = document.createElement('span');
     const b = document.createElement('b');
