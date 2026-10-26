@@ -64,7 +64,7 @@
   input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
   input[type="tel"], input[type="email"] { direction: ltr; text-align: right; }
   textarea { min-height: 80px; resize: vertical; }
-  .check { display: flex; gap: 10px; align-items: flex-start; font-size: .95rem; }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: .95rem; margin-top: 16px; }
   .check input { width: auto; margin-top: 4px; }
   .hp { position: absolute; right: -9999px; width: 1px; height: 1px; overflow: hidden; }
   button {
@@ -91,65 +91,25 @@
 <main>
   <header>
     <h1 id="title">הרשמה לטורניר פאדל</h1>
-    <p>נרשמים בזוגות. מלאו את הפרטים של שני השחקנים.</p>
+    <p>כל שחקן נרשם בנפרד. חלוקת הזוגות תתבצע לפי שיטת החלוקה של הרב דגני.</p>
   </header>
   <div class="meta" id="meta"></div>
 
   <form id="form" novalidate>
-    <fieldset>
-      <legend>הזוג</legend>
-      <div class="grid">
-        <div>
-          <label for="team_name">שם הזוג (לא חובה)</label>
-          <input id="team_name" name="team_name" maxlength="60">
-        </div>
-        <div>
-          <label for="category" class="req">קטגוריה</label>
-          <select id="category" name="category" required></select>
-        </div>
+    <div class="grid">
+      <div class="full">
+        <label for="name" class="req">שם מלא</label>
+        <input id="name" name="name" required autocomplete="name">
       </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>שחקן 1</legend>
-      <div class="grid">
-        <div class="full">
-          <label for="p1_name" class="req">שם מלא</label>
-          <input id="p1_name" name="p1_name" required autocomplete="name">
-        </div>
-        <div>
-          <label for="p1_phone" class="req">טלפון</label>
-          <input id="p1_phone" name="p1_phone" type="tel" required autocomplete="tel" inputmode="tel">
-        </div>
-        <div>
-          <label for="p1_email">אימייל</label>
-          <input id="p1_email" name="p1_email" type="email" autocomplete="email">
-        </div>
+      <div>
+        <label for="phone" class="req">טלפון</label>
+        <input id="phone" name="phone" type="tel" required autocomplete="tel" inputmode="tel">
       </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>שחקן 2</legend>
-      <div class="grid">
-        <div class="full">
-          <label for="p2_name" class="req">שם מלא</label>
-          <input id="p2_name" name="p2_name" required>
-        </div>
-        <div>
-          <label for="p2_phone" class="req">טלפון</label>
-          <input id="p2_phone" name="p2_phone" type="tel" required inputmode="tel">
-        </div>
-        <div>
-          <label for="p2_email">אימייל</label>
-          <input id="p2_email" name="p2_email" type="email">
-        </div>
+      <div>
+        <label for="email" class="req">אימייל</label>
+        <input id="email" name="email" type="email" required autocomplete="email">
       </div>
-    </fieldset>
-
-    <fieldset>
-      <label for="notes">הערות (שעות שלא מתאימות, בקשות וכו')</label>
-      <textarea id="notes" name="notes" maxlength="500"></textarea>
-    </fieldset>
+    </div>
 
     <div class="hp" aria-hidden="true">
       <label for="website">אתר</label>
@@ -158,7 +118,7 @@
 
     <label class="check">
       <input type="checkbox" id="terms" required>
-      <span>אני מאשר/ת שהפרטים נכונים ושיצרו איתי קשר בנוגע לטורניר.</span>
+      <span>אני מאשר/ת שהפרטים נכונים ושייצרו איתי קשר בנוגע לטורניר.</span>
     </label>
 
     <button type="submit" id="submit">שליחת הרשמה</button>
@@ -166,8 +126,8 @@
   </form>
 
   <div class="done" id="done" hidden>
-    <h2>נרשמתם!</h2>
-    <p>ההרשמה התקבלה. ניצור איתכם קשר לפני הטורניר.</p>
+    <h2>נרשמת!</h2>
+    <p>ההרשמה התקבלה. ניצור איתך קשר לפני הטורניר.</p>
   </div>
 </main>
 
@@ -181,7 +141,6 @@
     time: '17:00 עד 24:00',
     location: 'קניון רננים, קומה 5 (על הגג)',
     price: '200 ₪ לשחקן',
-    categories: ['מתחילים', 'בינוניים', 'מתקדמים'],
   };
   // ===============================
 
@@ -199,9 +158,6 @@
     $('meta').append(span);
   }
 
-  $('category').append(new Option('בחרו...', ''));
-  for (const c of CONFIG.categories) $('category').append(new Option(c, c));
-
   const phoneOk = (v) => /^[0-9+\-\s()]{9,15}$/.test(v.trim());
 
   form.addEventListener('submit', async (e) => {
@@ -215,12 +171,8 @@
       missing.focus();
       return;
     }
-    for (const id of ['p1_phone', 'p2_phone']) {
-      if (!phoneOk($(id).value)) { msg.textContent = 'מספר הטלפון לא נראה תקין.'; $(id).focus(); return; }
-    }
-    for (const id of ['p1_email', 'p2_email']) {
-      if ($(id).value && !$(id).checkValidity()) { msg.textContent = 'כתובת האימייל לא תקינה.'; $(id).focus(); return; }
-    }
+    if (!phoneOk($('phone').value)) { msg.textContent = 'מספר הטלפון לא נראה תקין.'; $('phone').focus(); return; }
+    if (!$('email').checkValidity()) { msg.textContent = 'כתובת האימייל לא תקינה.'; $('email').focus(); return; }
     if (CONFIG.scriptUrl.startsWith('PASTE')) {
       msg.textContent = 'הטופס עוד לא מחובר לגוגל שיטס (חסר scriptUrl).';
       return;

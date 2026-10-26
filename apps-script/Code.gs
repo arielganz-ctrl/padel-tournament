@@ -6,22 +6,16 @@
  * Full steps are in README.md.
  */
 
-// Optional: cap the number of pairs. 0 = unlimited.
-var MAX_TEAMS = 0;
+// Optional: cap the number of players. 0 = unlimited.
+var MAX_PLAYERS = 0;
 
-var SHEET_NAME = 'הרשמות';
+var SHEET_NAME = 'נרשמים';
 
 var FIELDS = [
   ['timestamp', 'תאריך הרשמה'],
-  ['team_name', 'שם הזוג'],
-  ['category', 'קטגוריה'],
-  ['p1_name', 'שחקן 1 - שם'],
-  ['p1_phone', 'שחקן 1 - טלפון'],
-  ['p1_email', 'שחקן 1 - אימייל'],
-  ['p2_name', 'שחקן 2 - שם'],
-  ['p2_phone', 'שחקן 2 - טלפון'],
-  ['p2_email', 'שחקן 2 - אימייל'],
-  ['notes', 'הערות'],
+  ['name', 'שם מלא'],
+  ['phone', 'טלפון'],
+  ['email', 'אימייל'],
 ];
 
 function getSheet_() {
@@ -53,7 +47,7 @@ function doPost(e) {
   // Honeypot field: real users never fill it in.
   if (p.website) return json_({ ok: true });
 
-  var required = ['p1_name', 'p1_phone', 'p2_name', 'p2_phone', 'category'];
+  var required = ['name', 'phone', 'email'];
   for (var i = 0; i < required.length; i++) {
     if (!String(p[required[i]] || '').trim()) {
       return json_({ ok: false, error: 'missing_' + required[i] });
@@ -64,7 +58,7 @@ function doPost(e) {
   lock.waitLock(10000);
   try {
     var sheet = getSheet_();
-    if (MAX_TEAMS > 0 && sheet.getLastRow() - 1 >= MAX_TEAMS) {
+    if (MAX_PLAYERS > 0 && sheet.getLastRow() - 1 >= MAX_PLAYERS) {
       return json_({ ok: false, error: 'full' });
     }
     var row = FIELDS.map(function (f) {
@@ -77,8 +71,8 @@ function doPost(e) {
   }
 }
 
-// Lets the page show how many pairs are registered.
+// Lets the page show how many players are registered.
 function doGet() {
   var sheet = getSheet_();
-  return json_({ ok: true, count: sheet.getLastRow() - 1, max: MAX_TEAMS });
+  return json_({ ok: true, count: sheet.getLastRow() - 1, max: MAX_PLAYERS });
 }
