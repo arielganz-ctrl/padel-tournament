@@ -229,17 +229,20 @@
     try {
       // form-urlencoded keeps this a "simple" request, so no CORS preflight
       const res = await fetch(CONFIG.scriptUrl, { method: 'POST', body: new URLSearchParams(new FormData(form)) });
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); }
+      catch { throw new Error(`HTTP ${res.status}: ${text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150)}`); }
       if (data.ok) {
         form.hidden = true;
         $('done').hidden = false;
       } else if (data.error === 'full') {
         msg.textContent = 'מצטערים, הטורניר מלא.';
       } else {
-        msg.textContent = 'משהו השתבש, נסו שוב.';
+        msg.textContent = `משהו השתבש, נסו שוב. (${data.error || 'unknown'})`;
       }
     } catch (err) {
-      msg.textContent = 'לא הצלחנו לשלוח. בדקו את החיבור ונסו שוב.';
+      msg.textContent = `לא הצלחנו לשלוח. בדקו את החיבור ונסו שוב. (${err.message})`;
     } finally {
       btn.disabled = false;
       btn.textContent = 'שליחת הרשמה';
