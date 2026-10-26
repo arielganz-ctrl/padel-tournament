@@ -203,6 +203,37 @@
 
   const phoneOk = (v) => /^[0-9+\-\s()]{9,15}$/.test(v.trim());
 
+  const getCount = async () => (await (await fetch(CONFIG.scriptUrl)).json()).count;
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  async function grewFrom(before) {
+    for (let i = 0; i < 5; i++) {
+      await sleep(1000);
+      if (await getCount() > before) return true;
+    }
+    return false;
+  }
+
+  async function submit(body) {
+    const before = await getCount().catch(() => null);
+    let res;
+    try {
+      // form-urlencoded keeps this a "simple" request, so no CORS preflight
+      res = await fetch(CONFIG.scriptUrl, { method: 'POST', body });
+    } catch (err) {
+      // Some browsers/blockers won't let us read the reply. Check whether the
+      // row landed anyway; if not, send blind and check again.
+      if (before === null) throw err;
+      if (await grewFrom(before)) return { ok: true };
+      await fetch(CONFIG.scriptUrl, { method: 'POST', body, mode: 'no-cors' });
+      if (await grewFrom(before)) return { ok: true };
+      throw new Error('saved-check failed: ' + err.message);
+    }
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch { throw new Error(`HTTP ${res.status}: ${text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150)}`); }
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     msg.textContent = '';
@@ -227,12 +258,7 @@
     btn.disabled = true;
     btn.textContent = 'שולח...';
     try {
-      // form-urlencoded keeps this a "simple" request, so no CORS preflight
-      const res = await fetch(CONFIG.scriptUrl, { method: 'POST', body: new URLSearchParams(new FormData(form)) });
-      const text = await res.text();
-      let data;
-      try { data = JSON.parse(text); }
-      catch { throw new Error(`HTTP ${res.status}: ${text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150)}`); }
+      const data = await submit(new URLSearchParams(new FormData(form)));
       if (data.ok) {
         form.hidden = true;
         $('done').hidden = false;
