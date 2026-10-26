@@ -41,6 +41,36 @@ function clean_(value) {
   return /^[=+\-@]/.test(s) ? "'" + s : s;
 }
 
+// 050-123 4567, +972501234567, 0501234567 and 501234567 (a number cell that
+// lost its leading zero) all become 501234567.
+function normPhone_(v) {
+  var d = String(v || '').replace(/\D/g, '');
+  if (d.indexOf('972') === 0) d = d.slice(3);
+  return d.replace(/^0+/, '');
+}
+
+function normEmail_(v) {
+  return String(v || '').trim().toLowerCase();
+}
+
+function findDuplicate_(sheet, p) {
+  var n = sheet.getLastRow() - 1;
+  if (n < 1) return null;
+  var phoneCol = indexOf_('phone'), emailCol = indexOf_('email');
+  var rows = sheet.getRange(2, 1, n, FIELDS.length).getValues();
+  var phone = normPhone_(p.phone), email = normEmail_(p.email);
+  for (var i = 0; i < rows.length; i++) {
+    if (phone && normPhone_(rows[i][phoneCol]) === phone) return 'duplicate_phone';
+    if (email && normEmail_(rows[i][emailCol]) === email) return 'duplicate_email';
+  }
+  return null;
+}
+
+function indexOf_(key) {
+  for (var i = 0; i < FIELDS.length; i++) if (FIELDS[i][0] === key) return i;
+  return -1;
+}
+
 function register_(p) {
   // Honeypot field: real users never fill it in.
   if (p.website) return { ok: true };
@@ -59,8 +89,13 @@ function register_(p) {
     if (MAX_PLAYERS > 0 && sheet.getLastRow() - 1 >= MAX_PLAYERS) {
       return { ok: false, error: 'full' };
     }
+    var dup = findDuplicate_(sheet, p);
+    if (dup) return { ok: false, error: dup };
     var row = FIELDS.map(function (f) {
-      return f[0] === 'timestamp' ? new Date() : clean_(p[f[0]]);
+      if (f[0] === 'timestamp') return new Date();
+      var v = clean_(p[f[0]]);
+      // keep the phone as text so Sheets doesn't drop the leading zero
+      return f[0] === 'phone' && v.charAt(0) !== "'" ? "'" + v : v;
     });
     sheet.appendRow(row);
     return { ok: true, count: sheet.getLastRow() - 1 };

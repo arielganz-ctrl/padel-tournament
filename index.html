@@ -416,6 +416,10 @@
         $('done').scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else if (data.error === 'full') {
         showFull();
+      } else if (data.error === 'duplicate_phone') {
+        msg.textContent = 'מספר הטלפון הזה כבר רשום לטורניר. אם יש טעות, פנו לאריאל גנץ.';
+      } else if (data.error === 'duplicate_email') {
+        msg.textContent = 'כתובת האימייל הזו כבר רשומה לטורניר. אם יש טעות, פנו לאריאל גנץ.';
       } else {
         msg.textContent = `משהו השתבש, נסו שוב. (${data.error || 'unknown'})`;
       }
