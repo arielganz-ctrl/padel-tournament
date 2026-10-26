@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>הרשמה לטורניר פאדל</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --bg: #f6f1e9;
+    --card: #ffffff;
+    --text: #2a2420;
+    --muted: #7a6e64;
+    --line: #e4dbcf;
+    --accent: #c4622d;
+    --accent-text: #ffffff;
+    --ok: #2f7d4f;
+    --err: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1b1714;
+      --card: #26201c;
+      --text: #f2ebe3;
+      --muted: #ab9f94;
+      --line: #3a322c;
+      --accent: #e07a44;
+      --accent-text: #1b1714;
+      --ok: #6fcf97;
+      --err: #f2867d;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Rubik", system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; }
+  header h1 { margin: 0 0 4px; font-size: 1.9rem; }
+  header p { margin: 0; color: var(--muted); }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 16px 0 24px; color: var(--muted); font-size: .95rem; }
+  .meta b { color: var(--text); font-weight: 500; }
+  form, .done { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px 20px; }
+  fieldset { border: 0; margin: 0 0 20px; padding: 0; }
+  legend { font-weight: 700; margin-bottom: 12px; font-size: 1.05rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .full { grid-column: 1 / -1; }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+  label { display: block; font-size: .9rem; margin-bottom: 4px; }
+  .req::after { content: " *"; color: var(--accent); }
+  input, select, textarea {
+    width: 100%;
+    font: inherit;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  input[type="tel"], input[type="email"] { direction: ltr; text-align: right; }
+  textarea { min-height: 80px; resize: vertical; }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: .95rem; }
+  .check input { width: auto; margin-top: 4px; }
+  .hp { position: absolute; right: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  button {
+    width: 100%;
+    margin-top: 8px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 12px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--accent-text);
+    cursor: pointer;
+  }
+  button:disabled { opacity: .6; cursor: wait; }
+  .msg { margin-top: 12px; min-height: 1.5em; color: var(--err); }
+  .done { text-align: center; }
+  .done h2 { color: var(--ok); margin-top: 0; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1 id="title">הרשמה לטורניר פאדל</h1>
+    <p>נרשמים בזוגות. מלאו את הפרטים של שני השחקנים.</p>
+  </header>
+  <div class="meta" id="meta"></div>
+
+  <form id="form" novalidate>
+    <fieldset>
+      <legend>הזוג</legend>
+      <div class="grid">
+        <div>
+          <label for="team_name">שם הזוג (לא חובה)</label>
+          <input id="team_name" name="team_name" maxlength="60">
+        </div>
+        <div>
+          <label for="category" class="req">קטגוריה</label>
+          <select id="category" name="category" required></select>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>שחקן 1</legend>
+      <div class="grid">
+        <div class="full">
+          <label for="p1_name" class="req">שם מלא</label>
+          <input id="p1_name" name="p1_name" required autocomplete="name">
+        </div>
+        <div>
+          <label for="p1_phone" class="req">טלפון</label>
+          <input id="p1_phone" name="p1_phone" type="tel" required autocomplete="tel" inputmode="tel">
+        </div>
+        <div>
+          <label for="p1_email">אימייל</label>
+          <input id="p1_email" name="p1_email" type="email" autocomplete="email">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>שחקן 2</legend>
+      <div class="grid">
+        <div class="full">
+          <label for="p2_name" class="req">שם מלא</label>
+          <input id="p2_name" name="p2_name" required>
+        </div>
+        <div>
+          <label for="p2_phone" class="req">טלפון</label>
+          <input id="p2_phone" name="p2_phone" type="tel" required inputmode="tel">
+        </div>
+        <div>
+          <label for="p2_email">אימייל</label>
+          <input id="p2_email" name="p2_email" type="email">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <label for="notes">הערות (שעות שלא מתאימות, בקשות וכו')</label>
+      <textarea id="notes" name="notes" maxlength="500"></textarea>
+    </fieldset>
+
+    <div class="hp" aria-hidden="true">
+      <label for="website">אתר</label>
+      <input id="website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <label class="check">
+      <input type="checkbox" id="terms" required>
+      <span>אני מאשר/ת שהפרטים נכונים ושיצרו איתי קשר בנוגע לטורניר.</span>
+    </label>
+
+    <button type="submit" id="submit">שליחת הרשמה</button>
+    <div class="msg" id="msg" role="alert"></div>
+  </form>
+
+  <div class="done" id="done" hidden>
+    <h2>נרשמתם!</h2>
+    <p>ההרשמה התקבלה. ניצור איתכם קשר לפני הטורניר.</p>
+  </div>
+</main>
+
+<script>
+  // ===== הגדרות - לערוך כאן =====
+  const CONFIG = {
+    // הכתובת שמקבלים אחרי Deploy ב-Apps Script (נגמרת ב-/exec)
+    scriptUrl: 'https://script.google.com/macros/s/AKfycbyV2BAO9fzSXQZCQuPR39qiSjyKm1rH2XspfbrRVDG1QuXZqznqPJBjRzqghfKwr9OezQ/exec',
+    title: 'הרשמה לטורניר פאדל',
+    date: 'יום שישי, 20.11.2026',
+    location: 'מועדון הפאדל',
+    price: '200 ₪ לזוג',
+    categories: ['מתחילים', 'בינוניים', 'מתקדמים'],
+  };
+  // ===============================
+
+  const $ = (id) => document.getElementById(id);
+  const form = $('form'), msg = $('msg'), btn = $('submit');
+
+  document.title = CONFIG.title;
+  $('title').textContent = CONFIG.title;
+  for (const [label, value] of [['תאריך', CONFIG.date], ['מקום', CONFIG.location], ['מחיר', CONFIG.price]]) {
+    if (!value) continue;
+    const span = document.createElement('span');
+    const b = document.createElement('b');
+    b.textContent = value;
+    span.append(label + ': ', b);
+    $('meta').append(span);
+  }
+
+  $('category').append(new Option('בחרו...', ''));
+  for (const c of CONFIG.categories) $('category').append(new Option(c, c));
+
+  const phoneOk = (v) => /^[0-9+\-\s()]{9,15}$/.test(v.trim());
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.textContent = '';
+
+    const missing = [...form.querySelectorAll('[required]')].find((el) =>
+      el.type === 'checkbox' ? !el.checked : !el.value.trim());
+    if (missing) {
+      msg.textContent = missing.type === 'checkbox' ? 'צריך לאשר את התנאים.' : 'יש למלא את כל שדות החובה.';
+      missing.focus();
+      return;
+    }
+    for (const id of ['p1_phone', 'p2_phone']) {
+      if (!phoneOk($(id).value)) { msg.textContent = 'מספר הטלפון לא נראה תקין.'; $(id).focus(); return; }
+    }
+    for (const id of ['p1_email', 'p2_email']) {
+      if ($(id).value && !$(id).checkValidity()) { msg.textContent = 'כתובת האימייל לא תקינה.'; $(id).focus(); return; }
+    }
+    if (CONFIG.scriptUrl.startsWith('PASTE')) {
+      msg.textContent = 'הטופס עוד לא מחובר לגוגל שיטס (חסר scriptUrl).';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'שולח...';
+    try {
+      // form-urlencoded keeps this a "simple" request, so no CORS preflight
+      const res = await fetch(CONFIG.scriptUrl, { method: 'POST', body: new URLSearchParams(new FormData(form)) });
+      const data = await res.json();
+      if (data.ok) {
+        form.hidden = true;
+        $('done').hidden = false;
+      } else if (data.error === 'full') {
+        msg.textContent = 'מצטערים, הטורניר מלא.';
+      } else {
+        msg.textContent = 'משהו השתבש, נסו שוב.';
+      }
+    } catch (err) {
+      msg.textContent = 'לא הצלחנו לשלוח. בדקו את החיבור ונסו שוב.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'שליחת הרשמה';
+    }
+  });
+</script>
+</body>
+</html>
