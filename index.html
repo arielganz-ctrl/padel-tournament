@@ -8,43 +8,62 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap">
 <style>
   :root {
-    --bg: #f6f1e9;
-    --card: #ffffff;
-    --text: #2a2420;
-    --muted: #7a6e64;
-    --line: #e4dbcf;
-    --accent: #c4622d;
-    --accent-text: #ffffff;
-    --ok: #2f7d4f;
-    --err: #b3261e;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1b1714;
-      --card: #26201c;
-      --text: #f2ebe3;
-      --muted: #ab9f94;
-      --line: #3a322c;
-      --accent: #e07a44;
-      --accent-text: #1b1714;
-      --ok: #6fcf97;
-      --err: #f2867d;
-    }
+    color-scheme: dark;
+    --bg: rgba(10, 14, 28, .55);
+    --card: rgba(16, 20, 36, .82);
+    --text: #f5f1ea;
+    --muted: #c9c1b6;
+    --line: rgba(255, 255, 255, .16);
+    --accent: #f07a1a;
+    --accent-text: #14100c;
+    --blue: #2d8cff;
+    --ok: #6fcf97;
+    --err: #ff8a80;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    background: var(--bg);
+    background: #0a0e1c;
     color: var(--text);
     font-family: "Rubik", system-ui, sans-serif;
     line-height: 1.5;
   }
+  /* fixed layer instead of background-attachment: fixed, which iOS ignores */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(to bottom, rgba(6, 9, 20, .35) 0%, rgba(6, 9, 20, .75) 45%, rgba(6, 9, 20, .9) 100%),
+      url("bg.jpg") center top / cover no-repeat;
+  }
+  /* on phones show the whole poster width instead of a cropped middle */
+  @media (max-aspect-ratio: 4/5) {
+    body::before {
+      background:
+        linear-gradient(to bottom, rgba(6, 9, 20, 0) 0%, rgba(6, 9, 20, 0) 30%, rgba(6, 9, 20, .85) 50%, #0a0e1c 62%),
+        url("bg.jpg") center top / 100% auto no-repeat,
+        #0a0e1c;
+    }
+    /* start the content below the poster's logo */
+    body main { padding-top: 56vw; }
+  }
+  header {
+    background: rgba(6, 9, 20, .62);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 18px 4px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
   main { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; }
   header h1 { margin: 0 0 4px; font-size: 1.9rem; }
   header p { margin: 0; color: var(--muted); }
-  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 16px 0 24px; color: var(--muted); font-size: .95rem; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 12px 0; color: var(--muted); font-size: .95rem; }
   .meta b { color: var(--text); font-weight: 500; }
-  form, .done { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px 20px; }
+  form, .done { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px 20px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
   fieldset { border: 0; margin: 0 0 20px; padding: 0; }
   legend { font-weight: 700; margin-bottom: 12px; font-size: 1.05rem; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -66,6 +85,18 @@
   textarea { min-height: 80px; resize: vertical; }
   .check { display: flex; gap: 10px; align-items: flex-start; font-size: .95rem; margin-top: 16px; }
   .check input { width: auto; margin-top: 4px; }
+  .q { margin-top: 20px; font-size: .95rem; }
+  .q p { margin: 0 0 10px; }
+  .yn { display: flex; gap: 10px; }
+  .yn label { flex: 1; margin: 0; }
+  .yn input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .yn span {
+    display: block; text-align: center; padding: 10px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--bg); cursor: pointer; font-weight: 500;
+    transition: background .15s, color .15s;
+  }
+  .yn input:checked + span { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .yn input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
   .hp { position: absolute; right: -9999px; width: 1px; height: 1px; overflow: hidden; }
   button {
     width: 100%;
@@ -92,8 +123,8 @@
   <header>
     <h1 id="title">הרשמה לטורניר פאדל</h1>
     <p>כל שחקן נרשם בנפרד. חלוקת הזוגות תתבצע לפי שיטת החלוקה של הרב דגני.</p>
+    <div class="meta" id="meta"></div>
   </header>
-  <div class="meta" id="meta"></div>
 
   <form id="form" novalidate>
     <div class="grid">
@@ -116,9 +147,17 @@
       <input id="website" name="website" tabindex="-1" autocomplete="off">
     </div>
 
+    <div class="q" role="radiogroup" aria-labelledby="boss-q">
+      <p id="boss-q" class="req">אני מאשר/ת שאריאל גנץ הוא אחראי הטורניר ואקשיב לכל מה שיבקש. במידה וישנן בעיות יש לפנות רק לניר זבולוני.</p>
+      <div class="yn">
+        <label><input type="radio" name="boss" value="כן" required><span>כן</span></label>
+        <label><input type="radio" name="boss" value="לא"><span>לא</span></label>
+      </div>
+    </div>
+
     <label class="check">
       <input type="checkbox" id="terms" required>
-      <span>אני מאשר/ת שהפרטים נכונים ושייצרו איתי קשר בנוגע לטורניר.</span>
+      <span>אני מאשר/ת שבמידה ואבטל את השתתפותי, כספי ההרשמה ייתרמו לקהילת יחד אחים.</span>
     </label>
 
     <button type="submit" id="submit">שליחת הרשמה</button>
@@ -158,6 +197,10 @@
     $('meta').append(span);
   }
 
+  // "לא" is not really an option
+  const [bossYes, bossNo] = form.querySelectorAll('input[name="boss"]');
+  bossNo.addEventListener('change', () => { bossYes.checked = true; });
+
   const phoneOk = (v) => /^[0-9+\-\s()]{9,15}$/.test(v.trim());
 
   form.addEventListener('submit', async (e) => {
@@ -165,9 +208,12 @@
     msg.textContent = '';
 
     const missing = [...form.querySelectorAll('[required]')].find((el) =>
-      el.type === 'checkbox' ? !el.checked : !el.value.trim());
+      el.type === 'checkbox' ? !el.checked :
+      el.type === 'radio' ? !form.querySelector(`input[name="${el.name}"]:checked`) :
+      !el.value.trim());
     if (missing) {
-      msg.textContent = missing.type === 'checkbox' ? 'צריך לאשר את התנאים.' : 'יש למלא את כל שדות החובה.';
+      msg.textContent = missing.type === 'checkbox' ? 'צריך לאשר את התנאים.' :
+        missing.type === 'radio' ? 'צריך לענות על השאלה.' : 'יש למלא את כל שדות החובה.';
       missing.focus();
       return;
     }
