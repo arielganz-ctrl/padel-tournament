@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>הרשמה לטורניר פאדל</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap">
 <style>
   :root {
     color-scheme: dark;
     --bg: rgba(10, 14, 28, .55);
     --card: rgba(16, 20, 36, .82);
+    --panel: rgba(6, 9, 20, .62);
     --text: #f5f1ea;
     --muted: #c9c1b6;
     --line: rgba(255, 255, 255, .16);
     --accent: #f07a1a;
+    --accent-soft: rgba(240, 122, 26, .14);
     --accent-text: #14100c;
     --blue: #2d8cff;
     --ok: #6fcf97;
@@ -49,29 +51,74 @@
     /* start the content below the poster's logo */
     body main { padding-top: 56vw; }
   }
-  header {
-    background: rgba(6, 9, 20, .62);
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; display: grid; gap: 16px; }
+
+  .panel {
+    background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 16px 18px 4px;
-    margin-bottom: 16px;
+    border-radius: 16px;
+    padding: 20px 18px;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
   }
-  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; }
-  header h1 { margin: 0 0 4px; font-size: 1.9rem; }
-  header p { margin: 0; color: var(--muted); }
-  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 12px 0; color: var(--muted); font-size: .95rem; }
-  .meta b { color: var(--text); font-weight: 500; }
-  form, .done { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px 20px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-  fieldset { border: 0; margin: 0 0 20px; padding: 0; }
-  legend { font-weight: 700; margin-bottom: 12px; font-size: 1.05rem; }
+  .eyebrow {
+    margin: 0 0 4px;
+    color: var(--accent);
+    font-weight: 800;
+    font-size: .8rem;
+    letter-spacing: .12em;
+    direction: ltr;
+    text-align: right;
+  }
+  h1 { margin: 0 0 6px; font-size: 1.9rem; line-height: 1.2; }
+  .lead { margin: 0; color: var(--muted); }
+
+  .info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+  .info li {
+    display: flex; gap: 10px; align-items: center;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+  }
+  .info li.wide { grid-column: 1 / -1; }
+  .info svg { flex: none; width: 22px; height: 22px; color: var(--accent); }
+  .info small { display: block; color: var(--muted); font-size: .78rem; line-height: 1.2; }
+  .info b { font-weight: 500; white-space: nowrap; }
+
+  .spots { margin-top: 16px; }
+  .spots-row { display: flex; justify-content: space-between; font-size: .9rem; color: var(--muted); margin-bottom: 6px; }
+  .spots-row b { color: var(--text); font-weight: 500; }
+  .bar { height: 8px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 0; background: linear-gradient(to left, var(--accent), #ffb15c); border-radius: inherit; transition: width .6s; }
+
+  .btn-ghost {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 16px; padding: 10px; border-radius: 10px;
+    border: 1px solid var(--blue); color: #9cc8ff; text-decoration: none; font-weight: 500;
+    background: rgba(45, 140, 255, .1);
+  }
+  .btn-ghost:hover { background: rgba(45, 140, 255, .2); }
+  .btn-ghost svg { width: 18px; height: 18px; }
+
+  .pay {
+    border-color: var(--accent);
+    background: linear-gradient(var(--accent-soft), var(--accent-soft)), var(--panel);
+  }
+  .pay h2 { margin: 0 0 6px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+  .pay h2 svg { width: 22px; height: 22px; color: var(--accent); }
+  .pay p { margin: 0 0 4px; }
+  .pay .note { margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(240, 122, 26, .5); font-weight: 700; color: #ffc48f; }
+
+  form, .done, .full { background: var(--card); }
+  .section-title { margin: 0 0 14px; font-size: 1.05rem; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .full { grid-column: 1 / -1; }
-  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+  .grid .full-row { grid-column: 1 / -1; }
+  @media (max-width: 520px) {
+    .grid { grid-template-columns: 1fr; }
+    .info li { padding: 10px; gap: 8px; }
+    .info b { font-size: .92rem; }
+  }
   label { display: block; font-size: .9rem; margin-bottom: 4px; }
   .req::after { content: " *"; color: var(--accent); }
-  input, select, textarea {
+  input {
     width: 100%;
     font: inherit;
     color: var(--text);
@@ -80,12 +127,12 @@
     border-radius: 8px;
     padding: 10px 12px;
   }
-  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
   input[type="tel"], input[type="email"] { direction: ltr; text-align: right; }
-  textarea { min-height: 80px; resize: vertical; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0 18px; }
   .check { display: flex; gap: 10px; align-items: flex-start; font-size: .95rem; margin-top: 16px; }
-  .check input { width: auto; margin-top: 4px; }
-  .q { margin-top: 20px; font-size: .95rem; }
+  .check input { width: auto; margin-top: 4px; accent-color: var(--accent); }
+  .q { font-size: .95rem; }
   .q p { margin: 0 0 10px; }
   .yn { display: flex; gap: 10px; }
   .yn label { flex: 1; margin: 0; }
@@ -100,11 +147,11 @@
   .hp { position: absolute; right: -9999px; width: 1px; height: 1px; overflow: hidden; }
   button {
     width: 100%;
-    margin-top: 8px;
+    margin-top: 20px;
     font: inherit;
     font-weight: 700;
     font-size: 1.05rem;
-    padding: 12px;
+    padding: 13px;
     border: 0;
     border-radius: 10px;
     background: var(--accent);
@@ -113,22 +160,67 @@
   }
   button:disabled { opacity: .6; cursor: wait; }
   .msg { margin-top: 12px; min-height: 1.5em; color: var(--err); }
-  .done { text-align: center; }
-  .done h2 { color: var(--ok); margin-top: 0; }
+  .done, .full { text-align: center; }
+  .done h2 { color: var(--ok); margin: 0 0 6px; font-size: 1.5rem; }
+  .full h2 { color: var(--accent); margin: 0 0 6px; }
+  .done .pay { text-align: right; margin-top: 16px; }
   [hidden] { display: none !important; }
 </style>
 </head>
 <body>
 <main>
-  <header>
+  <header class="panel">
+    <p class="eyebrow">PADEL ACHIM · TOURNAMENT #4</p>
     <h1 id="title">הרשמה לטורניר פאדל</h1>
-    <p>כל שחקן נרשם בנפרד. חלוקת הזוגות תתבצע לפי שיטת החלוקה של הרב דגני.</p>
-    <div class="meta" id="meta"></div>
+    <p class="lead">כל שחקן נרשם בנפרד. חלוקת הזוגות תתבצע לפי שיטת החלוקה של הרב דגני.</p>
+
+    <ul class="info">
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <div><small id="i-day">תאריך</small><b id="i-date"></b></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <div><small>שעות</small><b id="i-time" dir="ltr"></b></div>
+      </li>
+      <li class="wide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div><small>מקום</small><b id="i-location"></b></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>
+        <div><small>מחיר</small><b id="i-price"></b></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div><small>מוגבל ל-</small><b id="i-max"></b></div>
+      </li>
+    </ul>
+
+    <div class="spots" id="spots" hidden>
+      <div class="spots-row"><span>מקומות שנותרו</span><b id="spots-text"></b></div>
+      <div class="bar"><span id="spots-bar"></span></div>
+    </div>
+
+    <a class="btn-ghost cal-link" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>
+      הוספה ליומן
+    </a>
   </header>
 
-  <form id="form" novalidate>
+  <section class="panel pay" id="pay-box">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      תשלום
+    </h2>
+    <p>את דמי ההשתתפות (<b class="pay-price"></b>) יש להעביר ב<b>ביט</b> או ב-<b>PayBox</b> ל<b class="pay-to"></b>.</p>
+    <p class="note">ההרשמה מאושרת רק לאחר העברת התשלום.</p>
+  </section>
+
+  <form class="panel" id="form" novalidate>
+    <h2 class="section-title">פרטים אישיים</h2>
     <div class="grid">
-      <div class="full">
+      <div class="full-row">
         <label for="name" class="req">שם מלא</label>
         <input id="name" name="name" required autocomplete="name">
       </div>
@@ -147,6 +239,9 @@
       <input id="website" name="website" tabindex="-1" autocomplete="off">
     </div>
 
+    <hr>
+    <h2 class="section-title">אישורים</h2>
+
     <div class="q" role="radiogroup" aria-labelledby="boss-q">
       <p id="boss-q" class="req">אני מאשר/ת שאריאל גנץ הוא אחראי הטורניר ואקשיב לכל מה שיבקש. במידה וישנן בעיות יש לפנות רק לניר זבולוני.</p>
       <div class="yn">
@@ -164,10 +259,23 @@
     <div class="msg" id="msg" role="alert"></div>
   </form>
 
-  <div class="done" id="done" hidden>
-    <h2>נרשמת!</h2>
-    <p>ההרשמה התקבלה. ניצור איתך קשר לפני הטורניר.</p>
-  </div>
+  <section class="panel done" id="done" hidden>
+    <h2>ההרשמה נקלטה!</h2>
+    <p>נשאר רק צעד אחד כדי לשריין את המקום שלך:</p>
+    <div class="panel pay">
+      <p>להעביר <b class="pay-price"></b> ב<b>ביט</b> או ב-<b>PayBox</b> ל<b class="pay-to"></b>.</p>
+      <p class="note">ההרשמה מאושרת רק לאחר העברת התשלום.</p>
+    </div>
+    <a class="btn-ghost cal-link" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>
+      הוספה ליומן
+    </a>
+  </section>
+
+  <section class="panel full" id="full" hidden>
+    <h2>הטורניר מלא</h2>
+    <p>כל המקומות נתפסו. נתראה בטורניר הבא!</p>
+  </section>
 </main>
 
 <script>
@@ -175,11 +283,15 @@
   const CONFIG = {
     // הכתובת שמקבלים אחרי Deploy ב-Apps Script (נגמרת ב-/exec)
     scriptUrl: 'https://script.google.com/macros/s/AKfycbyV2BAO9fzSXQZCQuPR39qiSjyKm1rH2XspfbrRVDG1QuXZqznqPJBjRzqghfKwr9OezQ/exec',
+    calendarUrl: 'https://calendar.app.google/1evnFpWvK4H52jGU6',
     title: 'הרשמה לטורניר פאדל',
-    date: 'יום ראשון, 8.11.2026',
-    time: '17:00 עד 24:00',
+    day: 'יום ראשון',
+    date: '8.11.2026',
+    time: '17:00–24:00',
     location: 'קניון רננים, קומה 5 (על הגג)',
-    price: '200 ₪ לשחקן',
+    price: '150 ₪',
+    payTo: 'אריאל גנץ',
+    maxPlayers: 24,
   };
   // ===============================
 
@@ -188,14 +300,15 @@
 
   document.title = CONFIG.title;
   $('title').textContent = CONFIG.title;
-  for (const [label, value] of [['תאריך', CONFIG.date], ['שעות', CONFIG.time], ['מקום', CONFIG.location], ['מחיר', CONFIG.price]]) {
-    if (!value) continue;
-    const span = document.createElement('span');
-    const b = document.createElement('b');
-    b.textContent = value;
-    span.append(label + ': ', b);
-    $('meta').append(span);
-  }
+  $('i-day').textContent = CONFIG.day;
+  $('i-date').textContent = CONFIG.date;
+  $('i-time').textContent = CONFIG.time;
+  $('i-location').textContent = CONFIG.location;
+  $('i-price').textContent = CONFIG.price + ' לשחקן';
+  $('i-max').textContent = `${CONFIG.maxPlayers} שחקנים`;
+  document.querySelectorAll('.pay-price').forEach((el) => el.textContent = CONFIG.price);
+  document.querySelectorAll('.pay-to').forEach((el) => el.textContent = CONFIG.payTo);
+  document.querySelectorAll('.cal-link').forEach((el) => el.href = CONFIG.calendarUrl);
 
   // "לא" is not really an option
   const [bossYes, bossNo] = form.querySelectorAll('input[name="boss"]');
@@ -204,6 +317,22 @@
   const phoneOk = (v) => /^[0-9+\-\s()]{9,15}$/.test(v.trim());
 
   const getCount = async () => (await (await fetch(CONFIG.scriptUrl)).json()).count;
+
+  function showFull() {
+    form.hidden = true;
+    $('pay-box').hidden = true;
+    $('full').hidden = false;
+  }
+
+  function showSpots(count) {
+    const left = Math.max(0, CONFIG.maxPlayers - count);
+    $('spots-text').textContent = `${left} מתוך ${CONFIG.maxPlayers}`;
+    $('spots-bar').style.width = `${(left / CONFIG.maxPlayers) * 100}%`;
+    $('spots').hidden = false;
+    if (left === 0) showFull();
+  }
+
+  getCount().then(showSpots).catch(() => {});
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   async function grewFrom(before) {
@@ -216,6 +345,7 @@
 
   async function submit(body) {
     const before = await getCount().catch(() => null);
+    if (before !== null && before >= CONFIG.maxPlayers) return { ok: false, error: 'full' };
     let res;
     try {
       // form-urlencoded keeps this a "simple" request, so no CORS preflight
@@ -250,10 +380,6 @@
     }
     if (!phoneOk($('phone').value)) { msg.textContent = 'מספר הטלפון לא נראה תקין.'; $('phone').focus(); return; }
     if (!$('email').checkValidity()) { msg.textContent = 'כתובת האימייל לא תקינה.'; $('email').focus(); return; }
-    if (CONFIG.scriptUrl.startsWith('PASTE')) {
-      msg.textContent = 'הטופס עוד לא מחובר לגוגל שיטס (חסר scriptUrl).';
-      return;
-    }
 
     btn.disabled = true;
     btn.textContent = 'שולח...';
@@ -261,9 +387,11 @@
       const data = await submit(new URLSearchParams(new FormData(form)));
       if (data.ok) {
         form.hidden = true;
+        $('pay-box').hidden = true;
         $('done').hidden = false;
+        $('done').scrollIntoView({ behavior: 'smooth', block: 'start' });
       } else if (data.error === 'full') {
-        msg.textContent = 'מצטערים, הטורניר מלא.';
+        showFull();
       } else {
         msg.textContent = `משהו השתבש, נסו שוב. (${data.error || 'unknown'})`;
       }
