@@ -316,7 +316,24 @@
 
   const phoneOk = (v) => /^[0-9+\-\s()]{9,15}$/.test(v.trim());
 
-  const getCount = async () => (await (await fetch(CONFIG.scriptUrl)).json()).count;
+  // JSONP: the reply loads as a <script>, which works even where the browser
+  // blocks reading a cross-site fetch response.
+  let jsonpId = 0;
+  function jsonp(params) {
+    return new Promise((resolve, reject) => {
+      const cb = `__padel${Date.now()}_${jsonpId++}`;
+      const el = document.createElement('script');
+      const done = () => { clearTimeout(timer); delete window[cb]; el.remove(); };
+      const timer = setTimeout(() => { done(); reject(new Error('timeout')); }, 8000);
+      window[cb] = (data) => { done(); resolve(data); };
+      el.onerror = () => { done(); reject(new Error('script load failed')); };
+      el.src = `${CONFIG.scriptUrl}?${new URLSearchParams({ ...params, callback: cb })}`;
+      document.head.append(el);
+    });
+  }
+
+  const getCountFetch = async () => (await (await fetch(CONFIG.scriptUrl)).json()).count;
+  const getCount = () => jsonp({}).then((d) => d.count).catch(getCountFetch);
 
   function showFull() {
     form.hidden = true;
@@ -344,6 +361,11 @@
   }
 
   async function submit(body) {
+    try {
+      return await jsonp({ ...Object.fromEntries(body), action: 'register' });
+    } catch {
+      // older Apps Script deployment without JSONP support: use fetch
+    }
     const before = await getCount().catch(() => null);
     if (before !== null && before >= CONFIG.maxPlayers) return { ok: false, error: 'full' };
     let res;

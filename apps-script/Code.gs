@@ -41,16 +41,14 @@ function clean_(value) {
   return /^[=+\-@]/.test(s) ? "'" + s : s;
 }
 
-function doPost(e) {
-  var p = (e && e.parameter) || {};
-
+function register_(p) {
   // Honeypot field: real users never fill it in.
-  if (p.website) return json_({ ok: true });
+  if (p.website) return { ok: true };
 
   var required = ['name', 'phone', 'email'];
   for (var i = 0; i < required.length; i++) {
     if (!String(p[required[i]] || '').trim()) {
-      return json_({ ok: false, error: 'missing_' + required[i] });
+      return { ok: false, error: 'missing_' + required[i] };
     }
   }
 
@@ -59,20 +57,33 @@ function doPost(e) {
   try {
     var sheet = getSheet_();
     if (MAX_PLAYERS > 0 && sheet.getLastRow() - 1 >= MAX_PLAYERS) {
-      return json_({ ok: false, error: 'full' });
+      return { ok: false, error: 'full' };
     }
     var row = FIELDS.map(function (f) {
       return f[0] === 'timestamp' ? new Date() : clean_(p[f[0]]);
     });
     sheet.appendRow(row);
-    return json_({ ok: true, count: sheet.getLastRow() - 1 });
+    return { ok: true, count: sheet.getLastRow() - 1 };
   } finally {
     lock.releaseLock();
   }
 }
 
-// Lets the page show how many players are registered.
-function doGet() {
-  var sheet = getSheet_();
-  return json_({ ok: true, count: sheet.getLastRow() - 1, max: MAX_PLAYERS });
+function doPost(e) {
+  return json_(register_((e && e.parameter) || {}));
+}
+
+// Returns the registration count, or registers when action=register.
+// With ?callback=fn it answers as JSONP, which some browsers allow when they
+// block reading a cross-site fetch.
+function doGet(e) {
+  var p = (e && e.parameter) || {};
+  var result = p.action === 'register'
+    ? register_(p)
+    : { ok: true, count: getSheet_().getLastRow() - 1, max: MAX_PLAYERS };
+  if (p.callback && /^[A-Za-z_$][\w$.]*$/.test(p.callback)) {
+    return ContentService.createTextOutput(p.callback + '(' + JSON.stringify(result) + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return json_(result);
 }
