@@ -113,12 +113,167 @@ function doPost(e) {
 // block reading a cross-site fetch.
 function doGet(e) {
   var p = (e && e.parameter) || {};
-  var result = p.action === 'register'
-    ? register_(p)
-    : { ok: true, count: getSheet_().getLastRow() - 1, max: MAX_PLAYERS };
+  var result;
+  if (p.action === 'register') result = register_(p);
+  else if (p.action === 'rankinfo') result = rankInfo_(p.t);
+  else if (p.action === 'rank') result = rankSubmit_(p.t, p.order);
+  else result = { ok: true, count: getSheet_().getLastRow() - 1, max: MAX_PLAYERS };
   if (p.callback && /^[A-Za-z_$][\w$.]*$/.test(p.callback)) {
     return ContentService.createTextOutput(p.callback + '(' + JSON.stringify(result) + ')')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
   return json_(result);
+}
+
+/* ===================== שיבוץ זוגות (דירוג טיר 1 ← טיר 2) ===================== */
+
+var RANK_PAGE_URL = 'https://arielganz-ctrl.github.io/padel-tournament/rank.html';
+var RANK_SHEET_NAME = 'דירוגים';
+var TIER_HEADER = 'טיר (1/2)';
+var LINK_HEADER = 'קישור לדירוג';
+
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('🎾 שיבוץ זוגות')
+    .addItem('1. הוספת עמודת טיר', 'setupTiers')
+    .addItem('2. יצירת קישורי דירוג לטיר 1', 'makeRankLinks')
+    .addToUi();
+}
+
+// Tier and link live right after the registration fields.
+function tierCol_() { return FIELDS.length + 1; }
+function linkCol_() { return FIELDS.length + 2; }
+
+function setupTiers() {
+  var sheet = getSheet_();
+  sheet.getRange(1, tierCol_(), 1, 2).setValues([[TIER_HEADER, LINK_HEADER]]).setFontWeight('bold');
+  var rule = SpreadsheetApp.newDataValidation()
+    .requireValueInList(['1', '2'], true)
+    .setAllowInvalid(false)
+    .setHelpText('1 = טיר 1, 2 = טיר 2, ריק = לא בהגרלה')
+    .build();
+  sheet.getRange(2, tierCol_(), Math.max(sheet.getMaxRows() - 1, 1), 1).setDataValidation(rule);
+  SpreadsheetApp.getUi().alert('נוספה עמודת "' + TIER_HEADER + '". בחרו לכל שחקן 1 או 2 (ריק = לא בהגרלה), ואז הריצו "יצירת קישורי דירוג".');
+}
+
+function makeRankLinks() {
+  var sheet = getSheet_();
+  var players = readPlayers_();
+  var made = 0;
+  players.forEach(function (pl) {
+    if (pl.tier === '1' && !pl.token) {
+      var token = Utilities.getUuid().replace(/-/g, '').slice(0, 12);
+      sheet.getRange(pl.row, linkCol_()).setValue(RANK_PAGE_URL + '?t=' + token);
+      made++;
+    }
+  });
+  var t1 = players.filter(function (pl) { return pl.tier === '1'; }).length;
+  var t2 = players.filter(function (pl) { return pl.tier === '2'; }).length;
+  SpreadsheetApp.getUi().alert('נוצרו ' + made + ' קישורים חדשים.\nטיר 1: ' + t1 + ' שחקנים, טיר 2: ' + t2 + ' שחקנים.\nשלחו לכל שחקן טיר 1 את הקישור שבשורה שלו.');
+}
+
+function readPlayers_() {
+  var sheet = getSheet_();
+  var n = sheet.getLastRow() - 1;
+  if (n < 1) return [];
+  var values = sheet.getRange(2, 1, n, linkCol_()).getValues();
+  var nameCol = indexOf_('name');
+  return values.map(function (r, i) {
+    var link = String(r[linkCol_() - 1] || '');
+    var m = link.match(/[?&]t=([A-Za-z0-9]+)/);
+    return {
+      row: i + 2,
+      name: String(r[nameCol] || '').trim(),
+      tier: String(r[tierCol_() - 1] || '').trim(),
+      token: m ? m[1] : '',
+    };
+  }).filter(function (pl) { return pl.name; });
+}
+
+function tier2Names_(players) {
+  return players.filter(function (pl) { return pl.tier === '2'; })
+    .map(function (pl) { return pl.name; });
+}
+
+function findRanker_(players, token) {
+  if (!token) return null;
+  for (var i = 0; i < players.length; i++) {
+    if (players[i].tier === '1' && players[i].token === String(token)) return players[i];
+  }
+  return null;
+}
+
+function getRankSheet_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(RANK_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(RANK_SHEET_NAME);
+    sheet.setRightToLeft(true);
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+// Columns: עודכן | שחקן טיר 1 | קוד | מקום 1 | מקום 2 | ...
+function findRankRow_(sheet, token) {
+  var n = sheet.getLastRow() - 1;
+  if (n < 1) return null;
+  var tokens = sheet.getRange(2, 3, n, 1).getValues();
+  for (var i = 0; i < tokens.length; i++) {
+    if (String(tokens[i][0]) === token) return i + 2;
+  }
+  return null;
+}
+
+function rankInfo_(token) {
+  var players = readPlayers_();
+  var me = findRanker_(players, token);
+  if (!me) return { ok: false, error: 'bad_token' };
+  var names = tier2Names_(players);
+  var existing = null;
+  var sheet = getRankSheet_();
+  var row = findRankRow_(sheet, me.token);
+  if (row) {
+    var saved = sheet.getRange(row, 4, 1, Math.max(names.length, 1)).getValues()[0]
+      .map(String).filter(function (v) { return v; });
+    // only reuse a saved ranking if it still covers exactly the current tier 2
+    if (sameSet_(saved, names)) existing = saved;
+  }
+  return { ok: true, name: me.name, players: names, ranking: existing };
+}
+
+function rankSubmit_(token, orderJson) {
+  var order;
+  try { order = JSON.parse(orderJson); } catch (e) { return { ok: false, error: 'bad_order' }; }
+  if (!Array.isArray(order)) return { ok: false, error: 'bad_order' };
+  order = order.map(function (v) { return String(v).trim(); });
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var players = readPlayers_();
+    var me = findRanker_(players, token);
+    if (!me) return { ok: false, error: 'bad_token' };
+    if (!sameSet_(order, tier2Names_(players))) return { ok: false, error: 'players_changed' };
+
+    var sheet = getRankSheet_();
+    var header = ['עודכן', 'שחקן טיר 1', 'קוד'];
+    for (var i = 1; i <= order.length; i++) header.push('מקום ' + i);
+    sheet.getRange(1, 1, 1, header.length).setValues([header]).setFontWeight('bold');
+
+    var rowValues = [new Date(), me.name, me.token].concat(order.map(clean_));
+    var row = findRankRow_(sheet, me.token) || sheet.getLastRow() + 1;
+    sheet.getRange(row, 1, 1, sheet.getMaxColumns()).clearContent();
+    sheet.getRange(row, 1, 1, rowValues.length).setValues([rowValues]);
+    return { ok: true };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function sameSet_(a, b) {
+  if (a.length !== b.length) return false;
+  var x = a.slice().sort(), y = b.slice().sort();
+  for (var i = 0; i < x.length; i++) if (x[i] !== y[i]) return false;
+  return true;
 }
