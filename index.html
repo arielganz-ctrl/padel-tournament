@@ -157,7 +157,7 @@
 
     <label class="check">
       <input type="checkbox" id="terms" required>
-      <span>אני מאשר/ת שבמידה ואבטל את השתתפותי, כספי ההרשמה ייתרמו לקהילת יחד אחים.</span>
+      <span class="req">אני מאשר/ת שבמידה ואבטל את השתתפותי, כספי ההרשמה ייתרמו לקהילת יחד אחים.</span>
     </label>
 
     <button type="submit" id="submit">שליחת הרשמה</button>
@@ -212,7 +212,7 @@
       el.type === 'radio' ? !form.querySelector(`input[name="${el.name}"]:checked`) :
       !el.value.trim());
     if (missing) {
-      msg.textContent = missing.type === 'checkbox' ? 'צריך לאשר את התנאים.' :
+      msg.textContent = missing.type === 'checkbox' ? 'חובה לאשר את סעיף התרומה כדי להירשם.' :
         missing.type === 'radio' ? 'צריך לענות על השאלה.' : 'יש למלא את כל שדות החובה.';
       missing.focus();
       return;
