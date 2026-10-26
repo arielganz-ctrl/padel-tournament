@@ -7,7 +7,7 @@
  */
 
 // Optional: cap the number of players. 0 = unlimited.
-var MAX_PLAYERS = 30;
+var MAX_PLAYERS = 28;
 
 var SHEET_NAME = 'נרשמים';
 

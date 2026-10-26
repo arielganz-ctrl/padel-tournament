@@ -31,7 +31,7 @@
 אחרי דקה הטופס זמין בכתובת `https://arielganz-ctrl.github.io/padel-tournament/`.
 
 ## שימושי
-- **הגבלת מספר שחקנים:** ב-`Code.gs` (`MAX_PLAYERS`) וב-`index.html` (`maxPlayers` בבלוק `CONFIG`). כרגע 30. כשהטורניר מלא הטופס יציג הודעה.
+- **הגבלת מספר שחקנים:** ב-`Code.gs` (`MAX_PLAYERS`) וב-`index.html` (`maxPlayers` בבלוק `CONFIG`). כרגע 28. כשהטורניר מלא הטופס יציג הודעה.
 - **אחרי שינוי ב-Code.gs** צריך לעשות **Deploy ← Manage deployments ← עריכה ← Version: New version**, אחרת השינוי לא ייכנס לתוקף. הכתובת לא משתנה.
 - **התראה במייל על כל הרשמה:** בגיליון, **Tools ← Notification settings**.
 - ההרשמות נשמרות רק בגיליון שלך. אף אחד אחר לא יכול לקרוא אותן, גם לא דרך הטופס.
