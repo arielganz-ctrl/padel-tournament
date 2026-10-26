@@ -85,7 +85,7 @@
 
   .spots { margin-top: 16px; }
   .spots-row { display: flex; justify-content: space-between; font-size: .9rem; color: var(--muted); margin-bottom: 6px; }
-  .spots-row b { color: var(--text); font-weight: 500; }
+  .spots-row b { color: var(--text); font-weight: 700; font-size: 1.05rem; }
   .bar { height: 8px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
   .bar span { display: block; height: 100%; width: 0; background: linear-gradient(to left, var(--accent), #ffb15c); border-radius: inherit; transition: width .6s; }
 
@@ -198,7 +198,7 @@
     </ul>
 
     <div class="spots" id="spots" hidden>
-      <div class="spots-row"><span>מקומות שנותרו</span><b id="spots-text"></b></div>
+      <div class="spots-row"><span>נרשמו <b id="spots-count"></b> מתוך <b id="spots-max"></b></span><span id="spots-left"></span></div>
       <div class="bar"><span id="spots-bar"></span></div>
     </div>
 
@@ -343,8 +343,10 @@
 
   function showSpots(count) {
     const left = Math.max(0, CONFIG.maxPlayers - count);
-    $('spots-text').textContent = `${left} מתוך ${CONFIG.maxPlayers}`;
-    $('spots-bar').style.width = `${(left / CONFIG.maxPlayers) * 100}%`;
+    $('spots-count').textContent = Math.min(count, CONFIG.maxPlayers);
+    $('spots-max').textContent = CONFIG.maxPlayers;
+    $('spots-left').textContent = left === 1 ? 'נשאר מקום אחד!' : `נותרו ${left} מקומות`;
+    $('spots-bar').style.width = `${Math.min(100, (count / CONFIG.maxPlayers) * 100)}%`;
     $('spots').hidden = false;
     if (left === 0) showFull();
   }
