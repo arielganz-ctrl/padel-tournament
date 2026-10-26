@@ -324,7 +324,7 @@
       const cb = `__padel${Date.now()}_${jsonpId++}`;
       const el = document.createElement('script');
       const done = () => { clearTimeout(timer); delete window[cb]; el.remove(); };
-      const timer = setTimeout(() => { done(); reject(new Error('timeout')); }, 8000);
+      const timer = setTimeout(() => { done(); reject(new Error('timeout')); }, 45000);
       window[cb] = (data) => { done(); resolve(data); };
       el.onerror = () => { done(); reject(new Error('script load failed')); };
       el.src = `${CONFIG.scriptUrl}?${new URLSearchParams({ ...params, callback: cb })}`;
@@ -353,39 +353,10 @@
 
   getCount().then(showSpots).catch(() => {});
 
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  async function grewFrom(before) {
-    for (let i = 0; i < 5; i++) {
-      await sleep(1000);
-      if (await getCount() > before) return true;
-    }
-    return false;
-  }
-
-  async function submit(body) {
-    try {
-      return await jsonp({ ...Object.fromEntries(body), action: 'register' });
-    } catch {
-      // older Apps Script deployment without JSONP support: use fetch
-    }
-    const before = await getCount().catch(() => null);
-    if (before !== null && before >= CONFIG.maxPlayers) return { ok: false, error: 'full' };
-    let res;
-    try {
-      // form-urlencoded keeps this a "simple" request, so no CORS preflight
-      res = await fetch(CONFIG.scriptUrl, { method: 'POST', body });
-    } catch (err) {
-      // Some browsers/blockers won't let us read the reply. Check whether the
-      // row landed anyway; if not, send blind and check again.
-      if (before === null) throw err;
-      if (await grewFrom(before)) return { ok: true };
-      await fetch(CONFIG.scriptUrl, { method: 'POST', body, mode: 'no-cors' });
-      if (await grewFrom(before)) return { ok: true };
-      throw new Error('saved-check failed: ' + err.message);
-    }
-    const text = await res.text();
-    try { return JSON.parse(text); }
-    catch { throw new Error(`HTTP ${res.status}: ${text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150)}`); }
+  // Send once and wait. Never resend automatically: Apps Script can be slow
+  // to answer, and a resend after a slow success shows up as a duplicate.
+  function submit(body) {
+    return jsonp({ ...Object.fromEntries(body), action: 'register' });
   }
 
   form.addEventListener('submit', async (e) => {
@@ -424,7 +395,9 @@
         msg.textContent = `משהו השתבש, נסו שוב. (${data.error || 'unknown'})`;
       }
     } catch (err) {
-      msg.textContent = `לא הצלחנו לשלוח. בדקו את החיבור ונסו שוב. (${err.message})`;
+      msg.textContent = err.message === 'timeout'
+        ? 'השרת לא ענה בזמן. ייתכן שההרשמה נקלטה. רעננו את הדף ובדקו אם מספר הנרשמים עלה לפני שמנסים שוב.'
+        : `לא הצלחנו לשלוח. בדקו את החיבור ונסו שוב. (${err.message})`;
     } finally {
       btn.disabled = false;
       btn.textContent = 'שליחת הרשמה';
