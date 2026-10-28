@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>הרשמה לטורניר פאדל</title>
+<title>פאדל אחים · טורניר #4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800;900&display=swap">
 <style>
   :root {
     color-scheme: dark;
@@ -19,8 +19,8 @@
     --accent-soft: rgba(240, 122, 26, .14);
     --accent-text: #14100c;
     --blue: #2d8cff;
+    --blue-soft: rgba(45, 140, 255, .14);
     --ok: #6fcf97;
-    --err: #ff8a80;
   }
   * { box-sizing: border-box; }
   body {
@@ -62,16 +62,13 @@
     -webkit-backdrop-filter: blur(6px);
   }
   .eyebrow {
-    margin: 0 0 4px;
-    color: var(--accent);
-    font-weight: 800;
-    font-size: .8rem;
-    letter-spacing: .12em;
-    direction: ltr;
-    text-align: right;
+    margin: 0 0 4px; color: var(--accent); font-weight: 800; font-size: .8rem;
+    letter-spacing: .12em; direction: ltr; text-align: right;
   }
   h1 { margin: 0 0 6px; font-size: 1.9rem; line-height: 1.2; }
+  h2 { margin: 0 0 12px; font-size: 1.2rem; }
   .lead { margin: 0; color: var(--muted); }
+  .muted { color: var(--muted); }
 
   .info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
   .info li {
@@ -83,12 +80,13 @@
   .info small { display: block; color: var(--muted); font-size: .78rem; line-height: 1.2; }
   .info b { font-weight: 500; white-space: nowrap; }
 
-  .spots { margin-top: 16px; }
-  .spots-row { display: flex; justify-content: space-between; font-size: .9rem; color: var(--muted); margin-bottom: 6px; }
-  .spots-row b { color: var(--text); font-weight: 700; font-size: 1.05rem; }
-  .bar { height: 8px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
-  .bar span { display: block; height: 100%; width: 0; background: linear-gradient(to left, var(--accent), #ffb15c); border-radius: inherit; transition: width .6s; }
-
+  .cta {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 15px; border-radius: 14px; text-decoration: none;
+    background: var(--accent); color: var(--accent-text); font-weight: 800; font-size: 1.15rem;
+    box-shadow: 0 8px 28px rgba(240, 122, 26, .3);
+  }
+  .cta svg { width: 22px; height: 22px; }
   .btn-ghost {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     margin-top: 16px; padding: 10px; border-radius: 10px;
@@ -98,311 +96,150 @@
   .btn-ghost:hover { background: rgba(45, 140, 255, .2); }
   .btn-ghost svg { width: 18px; height: 18px; }
 
+  .house + .house { margin-top: 20px; }
+  .hh { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .badge { font-weight: 800; padding: 2px 14px; border-radius: 10px; font-size: 1.05rem; }
+  .hh .line { flex: 1; height: 2px; border-radius: 2px; }
+  .hh .cnt { color: var(--muted); font-size: .85rem; }
+  .house.A .badge { background: var(--accent); color: var(--accent-text); }
+  .house.A .line { background: linear-gradient(to left, var(--accent), transparent); }
+  .house.B .badge { background: var(--blue); color: #fff; }
+  .house.B .line { background: linear-gradient(to left, var(--blue), transparent); }
+  .pairs { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+  .pairs li {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px;
+  }
+  .house.A .pairs li { border-right: 4px solid var(--accent); }
+  .house.B .pairs li { border-right: 4px solid var(--blue); }
+  .num {
+    flex: none; width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 800; font-size: .9rem;
+  }
+  .house.A .num { background: var(--accent-soft); color: #ffb57a; border: 1.5px solid var(--accent); }
+  .house.B .num { background: var(--blue-soft); color: #9cc8ff; border: 1.5px solid var(--blue); }
+  .pairs .names { font-weight: 500; }
+  .amp { font-weight: 800; margin: 0 4px; }
+  .house.A .amp { color: var(--accent); }
+  .house.B .amp { color: var(--blue); }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .steps li { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: baseline; }
+  .steps .t { color: var(--accent); font-weight: 800; direction: ltr; min-width: 3.2em; }
+  .steps .d { color: var(--muted); grid-column: 2; font-size: .92rem; }
+  .fmt { margin-top: 14px; display: grid; gap: 8px; }
+  .fmt div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .fmt b { color: #ffc48f; }
+
   .pay {
     border-color: var(--accent);
     background: linear-gradient(var(--accent-soft), var(--accent-soft)), var(--panel);
   }
-  .pay h2 { margin: 0 0 6px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+  .pay h2 { display: flex; align-items: center; gap: 8px; }
   .pay h2 svg { width: 22px; height: 22px; color: var(--accent); }
-  .pay p { margin: 0 0 4px; }
+  .pay p { margin: 0 0 6px; }
   .pay .note { margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(240, 122, 26, .5); font-weight: 700; color: #ffc48f; }
-
-  form, .done, .full { background: var(--card); }
-  .section-title { margin: 0 0 14px; font-size: 1.05rem; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .grid .full-row { grid-column: 1 / -1; }
-  @media (max-width: 520px) {
-    .grid { grid-template-columns: 1fr; }
+  .closed { text-align: center; color: var(--muted); font-size: .9rem; }
+  @media (max-width: 400px) {
     .info li { padding: 10px; gap: 8px; }
     .info b { font-size: .92rem; }
   }
-  label { display: block; font-size: .9rem; margin-bottom: 4px; }
-  .req::after { content: " *"; color: var(--accent); }
-  input {
-    width: 100%;
-    font: inherit;
-    color: var(--text);
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 10px 12px;
-  }
-  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
-  input[type="tel"], input[type="email"] { direction: ltr; text-align: right; }
-  hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0 18px; }
-  .check { display: flex; gap: 10px; align-items: flex-start; font-size: .95rem; margin-top: 16px; }
-  .check input { width: auto; margin-top: 4px; accent-color: var(--accent); }
-  .q { font-size: .95rem; }
-  .q p { margin: 0 0 10px; }
-  .yn { display: flex; gap: 10px; }
-  .yn label { flex: 1; margin: 0; }
-  .yn input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-  .yn span {
-    display: block; text-align: center; padding: 10px; border-radius: 8px;
-    border: 1px solid var(--line); background: var(--bg); cursor: pointer; font-weight: 500;
-    transition: background .15s, color .15s;
-  }
-  .yn input:checked + span { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .yn input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .hp { position: absolute; right: -9999px; width: 1px; height: 1px; overflow: hidden; }
-  button {
-    width: 100%;
-    margin-top: 20px;
-    font: inherit;
-    font-weight: 700;
-    font-size: 1.05rem;
-    padding: 13px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--accent);
-    color: var(--accent-text);
-    cursor: pointer;
-  }
-  button:disabled { opacity: .6; cursor: wait; }
-  .msg { margin-top: 12px; min-height: 1.5em; color: var(--err); }
-  .done, .full { text-align: center; }
-  .done h2 { color: var(--ok); margin: 0 0 6px; font-size: 1.5rem; }
-  .full h2 { color: var(--accent); margin: 0 0 6px; }
-  .done .pay { text-align: right; margin-top: 16px; }
-  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
 <main>
   <header class="panel">
     <p class="eyebrow">PADEL ACHIM · TOURNAMENT #4</p>
-    <h1 id="title">הרשמה לטורניר פאדל</h1>
-    <p class="lead">כל שחקן נרשם בנפרד. חלוקת הזוגות תתבצע לפי שיטת החלוקה של הרב דגני.</p>
+    <h1>פאדל אחים · טורניר #4</h1>
+    <p class="lead">השיבוץ נקבע, 14 זוגות בשני בתים. נתראה על הגג 🔥</p>
 
     <ul class="info">
       <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        <div><small id="i-day">תאריך</small><b id="i-date"></b></div>
+        <div><small>יום ראשון</small><b>8.11.2026</b></div>
       </li>
       <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        <div><small>שעות</small><b id="i-time" dir="ltr"></b></div>
+        <div><small>מתחילים</small><b dir="ltr">17:00</b></div>
       </li>
       <li class="wide">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        <div><small>מקום</small><b id="i-location"></b></div>
-      </li>
-      <li>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>
-        <div><small>מחיר</small><b id="i-price"></b></div>
-      </li>
-      <li>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <div><small>מוגבל ל-</small><b id="i-max"></b></div>
+        <div><small>מקום</small><b>קניון רננים, קומה 5 (על הגג)</b></div>
       </li>
     </ul>
 
-    <div class="spots" id="spots" hidden>
-      <div class="spots-row"><span>נרשמו <b id="spots-count"></b> מתוך <b id="spots-max"></b></span><span id="spots-left"></span></div>
-      <div class="bar"><span id="spots-bar"></span></div>
-    </div>
-
-    <a class="btn-ghost cal-link" target="_blank" rel="noopener">
+    <a class="btn-ghost" href="https://calendar.app.google/1evnFpWvK4H52jGU6" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>
       הוספה ליומן
     </a>
   </header>
 
-  <section class="panel pay" id="pay-box">
+  <a class="cta" href="schedule.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
+    לוח המשחקים: מתי ומול מי אני משחק?
+  </a>
+
+  <section class="panel">
+    <h2>הזוגות</h2>
+    <div class="house A">
+      <div class="hh"><span class="badge">בית A</span><span class="line"></span><span class="cnt" id="cnt-A"></span></div>
+      <ol class="pairs" id="pairs-A"></ol>
+    </div>
+    <div class="house B">
+      <div class="hh"><span class="badge">בית B</span><span class="line"></span><span class="cnt" id="cnt-B"></span></div>
+      <ol class="pairs" id="pairs-B"></ol>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>איך זה עובד</h2>
+    <ol class="steps">
+      <li><span class="t">17:00</span><b>שלב הבתים</b><span class="d">6 סבבים של 30 דקות. כל זוג משחק 4 משחקים, ואף זוג לא משחק יותר מ-2 ברצף. בבית A כל זוג פוגש זוג מכל רמה. בבית B כולם נגד כולם.</span></li>
+      <li><span class="t">20:15</span><b>רבע גמר</b><span class="d">עולים 6 זוגות מבית A ו-2 זוגות מבית B.</span></li>
+      <li><span class="t">20:45</span><b>חצי גמר</b></li>
+      <li><span class="t">21:15</span><b>גמר 🏆 ומשחק על מקום 3</b></li>
+    </ol>
+    <div class="fmt">
+      <div><b>שלב הבתים:</b> הטוב מ-7 משחקונים. ב-3:3 טייברייק עד 7 נקודות.</div>
+      <div><b>מרבע הגמר:</b> הטוב מ-11 משחקונים. ב-5:5 טייברייק עד 7 נקודות.</div>
+      <div><b>דירוג בבית:</b> ניצחון = נקודה. בשוויון: הפרש משחקונים, ואז המפגש הישיר.</div>
+    </div>
+    <p class="muted" style="margin:12px 0 0">בעיות ושאלות: ניר זבולוני בלבד 😉</p>
+  </section>
+
+  <section class="panel pay">
     <h2>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
       תשלום
     </h2>
-    <p>את דמי ההשתתפות (<b class="pay-price"></b>) יש להעביר ב<b>ביט</b> או ב-<b>PayBox</b> ל<b class="pay-to"></b>.</p>
-    <p class="note">ההרשמה מאושרת רק לאחר העברת התשלום.</p>
+    <p><b>150 ₪ לשחקן</b>, ב<b>ביט</b> או ב-<b>PayBox</b> ל<b>אריאל גנץ</b>.</p>
+    <p class="note">ההשתתפות מאושרת רק לאחר העברת התשלום. מי שמבטל, כספי ההרשמה נתרמים לקהילת יחד אחים.</p>
   </section>
 
-  <form class="panel" id="form" novalidate>
-    <h2 class="section-title">פרטים אישיים</h2>
-    <div class="grid">
-      <div class="full-row">
-        <label for="name" class="req">שם מלא</label>
-        <input id="name" name="name" required autocomplete="name">
-      </div>
-      <div>
-        <label for="phone" class="req">טלפון</label>
-        <input id="phone" name="phone" type="tel" required autocomplete="tel" inputmode="tel">
-      </div>
-      <div>
-        <label for="email" class="req">אימייל</label>
-        <input id="email" name="email" type="email" required autocomplete="email">
-      </div>
-    </div>
-
-    <div class="hp" aria-hidden="true">
-      <label for="website">אתר</label>
-      <input id="website" name="website" tabindex="-1" autocomplete="off">
-    </div>
-
-    <hr>
-    <h2 class="section-title">אישורים</h2>
-
-    <div class="q" role="radiogroup" aria-labelledby="boss-q">
-      <p id="boss-q" class="req">אני מאשר/ת שאריאל גנץ הוא אחראי הטורניר ואקשיב לכל מה שיבקש. במידה וישנן בעיות יש לפנות רק לניר זבולוני.</p>
-      <div class="yn">
-        <label><input type="radio" name="boss" value="כן" required><span>כן</span></label>
-        <label><input type="radio" name="boss" value="לא"><span>לא</span></label>
-      </div>
-    </div>
-
-    <label class="check">
-      <input type="checkbox" id="terms" required>
-      <span class="req">אני מאשר/ת שבמידה ואבטל את השתתפותי, כספי ההרשמה ייתרמו לקהילת יחד אחים.</span>
-    </label>
-
-    <button type="submit" id="submit">שליחת הרשמה</button>
-    <div class="msg" id="msg" role="alert"></div>
-  </form>
-
-  <section class="panel done" id="done" hidden>
-    <h2>ההרשמה נקלטה!</h2>
-    <p>נשאר רק צעד אחד כדי לשריין את המקום שלך:</p>
-    <div class="panel pay">
-      <p>להעביר <b class="pay-price"></b> ב<b>ביט</b> או ב-<b>PayBox</b> ל<b class="pay-to"></b>.</p>
-      <p class="note">ההרשמה מאושרת רק לאחר העברת התשלום.</p>
-    </div>
-    <a class="btn-ghost cal-link" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>
-      הוספה ליומן
-    </a>
-  </section>
-
-  <section class="panel full" id="full" hidden>
-    <h2>הטורניר מלא</h2>
-    <p>כל המקומות נתפסו. נתראה בטורניר הבא!</p>
-  </section>
+  <p class="closed">ההרשמה לטורניר נסגרה · 28 שחקנים</p>
 </main>
 
+<script src="data.js"></script>
 <script>
-  // ===== הגדרות - לערוך כאן =====
-  const CONFIG = {
-    // הכתובת שמקבלים אחרי Deploy ב-Apps Script (נגמרת ב-/exec)
-    scriptUrl: 'https://script.google.com/macros/s/AKfycbyV2BAO9fzSXQZCQuPR39qiSjyKm1rH2XspfbrRVDG1QuXZqznqPJBjRzqghfKwr9OezQ/exec',
-    calendarUrl: 'https://calendar.app.google/1evnFpWvK4H52jGU6',
-    title: 'הרשמה לטורניר פאדל',
-    day: 'יום ראשון',
-    date: '8.11.2026',
-    time: '17:00–24:00',
-    location: 'קניון רננים, קומה 5 (על הגג)',
-    price: '150 ₪',
-    payTo: 'אריאל גנץ',
-    maxPlayers: 28,
-  };
-  // ===============================
-
-  const $ = (id) => document.getElementById(id);
-  const form = $('form'), msg = $('msg'), btn = $('submit');
-
-  document.title = CONFIG.title;
-  $('title').textContent = CONFIG.title;
-  $('i-day').textContent = CONFIG.day;
-  $('i-date').textContent = CONFIG.date;
-  $('i-time').textContent = CONFIG.time;
-  $('i-location').textContent = CONFIG.location;
-  $('i-price').textContent = CONFIG.price + ' לשחקן';
-  $('i-max').textContent = `${CONFIG.maxPlayers} שחקנים`;
-  document.querySelectorAll('.pay-price').forEach((el) => el.textContent = CONFIG.price);
-  document.querySelectorAll('.pay-to').forEach((el) => el.textContent = CONFIG.payTo);
-  document.querySelectorAll('.cal-link').forEach((el) => el.href = CONFIG.calendarUrl);
-
-  // "לא" is not really an option
-  const [bossYes, bossNo] = form.querySelectorAll('input[name="boss"]');
-  bossNo.addEventListener('change', () => { bossYes.checked = true; });
-
-  const phoneOk = (v) => /^[0-9+\-\s()]{9,15}$/.test(v.trim());
-
-  // JSONP: the reply loads as a <script>, which works even where the browser
-  // blocks reading a cross-site fetch response.
-  let jsonpId = 0;
-  function jsonp(params) {
-    return new Promise((resolve, reject) => {
-      const cb = `__padel${Date.now()}_${jsonpId++}`;
-      const el = document.createElement('script');
-      const done = () => { clearTimeout(timer); delete window[cb]; el.remove(); };
-      const timer = setTimeout(() => { done(); reject(new Error('timeout')); }, 45000);
-      window[cb] = (data) => { done(); resolve(data); };
-      el.onerror = () => { done(); reject(new Error('script load failed')); };
-      el.src = `${CONFIG.scriptUrl}?${new URLSearchParams({ ...params, callback: cb })}`;
-      document.head.append(el);
+  for (const h of ['A', 'B']) {
+    const list = document.getElementById(`pairs-${h}`);
+    window.TOURNAMENT[h].forEach((pair, i) => {
+      const [a, b] = pair.split(' + ');
+      const li = document.createElement('li');
+      const num = document.createElement('span');
+      num.className = 'num';
+      num.textContent = i + 1;
+      const names = document.createElement('span');
+      names.className = 'names';
+      const amp = document.createElement('span');
+      amp.className = 'amp';
+      amp.textContent = '&';
+      names.append(a, amp, b);
+      li.append(num, names);
+      list.append(li);
     });
+    document.getElementById(`cnt-${h}`).textContent = `${window.TOURNAMENT[h].length} זוגות`;
   }
-
-  const getCountFetch = async () => (await (await fetch(CONFIG.scriptUrl)).json()).count;
-  const getCount = () => jsonp({}).then((d) => d.count).catch(getCountFetch);
-
-  function showFull() {
-    form.hidden = true;
-    $('pay-box').hidden = true;
-    $('full').hidden = false;
-  }
-
-  function showSpots(count) {
-    const left = Math.max(0, CONFIG.maxPlayers - count);
-    $('spots-count').textContent = Math.min(count, CONFIG.maxPlayers);
-    $('spots-max').textContent = CONFIG.maxPlayers;
-    $('spots-left').textContent = left === 1 ? 'נשאר מקום אחד!' : `נותרו ${left} מקומות`;
-    $('spots-bar').style.width = `${Math.min(100, (count / CONFIG.maxPlayers) * 100)}%`;
-    $('spots').hidden = false;
-    if (left === 0) showFull();
-  }
-
-  getCount().then(showSpots).catch(() => {});
-
-  // Send once and wait. Never resend automatically: Apps Script can be slow
-  // to answer, and a resend after a slow success shows up as a duplicate.
-  function submit(body) {
-    return jsonp({ ...Object.fromEntries(body), action: 'register' });
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    msg.textContent = '';
-
-    const missing = [...form.querySelectorAll('[required]')].find((el) =>
-      el.type === 'checkbox' ? !el.checked :
-      el.type === 'radio' ? !form.querySelector(`input[name="${el.name}"]:checked`) :
-      !el.value.trim());
-    if (missing) {
-      msg.textContent = missing.type === 'checkbox' ? 'חובה לאשר את סעיף התרומה כדי להירשם.' :
-        missing.type === 'radio' ? 'צריך לענות על השאלה.' : 'יש למלא את כל שדות החובה.';
-      missing.focus();
-      return;
-    }
-    if (!phoneOk($('phone').value)) { msg.textContent = 'מספר הטלפון לא נראה תקין.'; $('phone').focus(); return; }
-    if (!$('email').checkValidity()) { msg.textContent = 'כתובת האימייל לא תקינה.'; $('email').focus(); return; }
-
-    btn.disabled = true;
-    btn.textContent = 'שולח...';
-    try {
-      const data = await submit(new URLSearchParams(new FormData(form)));
-      if (data.ok) {
-        form.hidden = true;
-        $('pay-box').hidden = true;
-        $('done').hidden = false;
-        $('done').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else if (data.error === 'full') {
-        showFull();
-      } else if (data.error === 'duplicate_phone') {
-        msg.textContent = 'מספר הטלפון הזה כבר רשום לטורניר. אם יש טעות, פנו לאריאל גנץ.';
-      } else if (data.error === 'duplicate_email') {
-        msg.textContent = 'כתובת האימייל הזו כבר רשומה לטורניר. אם יש טעות, פנו לאריאל גנץ.';
-      } else {
-        msg.textContent = `משהו השתבש, נסו שוב. (${data.error || 'unknown'})`;
-      }
-    } catch (err) {
-      msg.textContent = err.message === 'timeout'
-        ? 'השרת לא ענה בזמן. ייתכן שההרשמה נקלטה. רעננו את הדף ובדקו אם מספר הנרשמים עלה לפני שמנסים שוב.'
-        : `לא הצלחנו לשלוח. בדקו את החיבור ונסו שוב. (${err.message})`;
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'שליחת הרשמה';
-    }
-  });
 </script>
 </body>
 </html>
