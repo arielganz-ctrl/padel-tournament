@@ -103,20 +103,20 @@
   <section class="panel">
     <h2>הזוגות</h2>
     <div class="pairs">
-      <div><h3><span class="tag A">דרג א'</span> 9 זוגות</h3><ol id="list-A"></ol></div>
-      <div><h3><span class="tag B">דרג ב'</span> 5 זוגות</h3><ol id="list-B"></ol></div>
+      <div><h3><span class="tag A">בית A</span> 9 זוגות</h3><ol id="list-A"></ol></div>
+      <div><h3><span class="tag B">בית B</span> 5 זוגות</h3><ol id="list-B"></ol></div>
     </div>
   </section>
 
   <section class="panel" id="league">
-    <h2>שלב הליגה</h2>
-    <p class="muted" style="margin:0 0 14px">כל זוג משחק 4 משחקים ונח 2 סבבים, ואף זוג לא משחק יותר מ-2 משחקים ברצף. בדרג ב' כל זוג פוגש את כל השאר.</p>
+    <h2>שלב הבתים</h2>
+    <p class="muted" style="margin:0 0 14px">כל זוג משחק 4 משחקים ונח 2 סבבים, ואף זוג לא משחק יותר מ-2 משחקים ברצף. בבית B כל זוג פוגש את כל השאר.</p>
     <div id="rounds"></div>
   </section>
 
   <section class="panel">
     <h2>שלב הנוקאאוט</h2>
-    <p class="muted" style="margin:0 0 14px">עולים 6 הזוגות הראשונים מדרג א' ו-2 הראשונים מדרג ב'.</p>
+    <p class="muted" style="margin:0 0 14px">עולים 6 הזוגות הראשונים מבית A ו-2 הראשונים מבית B.</p>
     <div class="bracket" id="ko"></div>
   </section>
 
@@ -138,7 +138,7 @@
   const DATA = {
  "A": [
   "ניר זבולוני + אלסנדרו כהן",
-  "יהודה + אליאור שרייבר",
+  "יהודה הלוי + אליאור שרייבר",
   "נאור חורב + גוש גייקובסון",
   "חיים פין + דן דגני",
   "קווין לוי + יוני כהן",
@@ -163,7 +163,7 @@
    ],
    [
     "A",
-    "יהודה + אליאור שרייבר",
+    "יהודה הלוי + אליאור שרייבר",
     "חיים פין + דן דגני"
    ],
    [
@@ -185,7 +185,7 @@
   [
    [
     "A",
-    "יהודה + אליאור שרייבר",
+    "יהודה הלוי + אליאור שרייבר",
     "נאור חורב + גוש גייקובסון"
    ],
    [
@@ -235,7 +235,7 @@
    [
     "A",
     "ניר זבולוני + אלסנדרו כהן",
-    "יהודה + אליאור שרייבר"
+    "יהודה הלוי + אליאור שרייבר"
    ],
    [
     "A",
@@ -261,7 +261,7 @@
   [
    [
     "A",
-    "יהודה + אליאור שרייבר",
+    "יהודה הלוי + אליאור שרייבר",
     "שחר אלימלך + יואל שוואלב"
    ],
    [
@@ -314,7 +314,7 @@
   const toMin = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
   const fmt = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-  const tag = (t) => el('span', `tag ${t}`, t === 'A' ? "דרג א'" : "דרג ב'");
+  const tag = (t) => el('span', `tag ${t}`, t === 'A' ? 'בית A' : 'בית B');
 
   const roundTime = (r) => fmt(toMin(START) + r * SLOT);
   const koStart = toMin(START) + DATA.rounds.length * SLOT + KO_BREAK;
@@ -323,7 +323,7 @@
   const pick = $('pick');
   for (const t of ['A', 'B']) {
     const g = document.createElement('optgroup');
-    g.label = t === 'A' ? "דרג א'" : "דרג ב'";
+    g.label = t === 'A' ? 'בית A' : 'בית B';
     g.append(...DATA[t].map((p) => new Option(p, p)));
     pick.append(g);
   }
@@ -351,7 +351,7 @@
   });
 
   const ko = [
-    ['רבע גמר', 0, [["מקום 1 דרג א'", "מקום 2 דרג ב'"], ["מקום 2 דרג א'", "מקום 1 דרג ב'"], ["מקום 3 דרג א'", "מקום 6 דרג א'"], ["מקום 4 דרג א'", "מקום 5 דרג א'"]]],
+    ['רבע גמר', 0, [["מקום 1 בית A", "מקום 2 בית B"], ["מקום 2 בית A", "מקום 1 בית B"], ["מקום 3 בית A", "מקום 6 בית A"], ["מקום 4 בית A", "מקום 5 בית A"]]],
     ['חצי גמר', 1, [['מנצחת רבע 1', 'מנצחת רבע 4'], ['מנצחת רבע 2', 'מנצחת רבע 3']]],
     ['גמר 🏆', 2, [['מנצחת חצי 1', 'מנצחת חצי 2'], ['מפסידת חצי 1', 'מפסידת חצי 2']]],
   ];
