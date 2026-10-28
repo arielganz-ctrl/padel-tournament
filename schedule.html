@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>לוח משחקים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: rgba(10, 14, 28, .55);
+    --card: rgba(16, 20, 36, .82);
+    --panel: rgba(6, 9, 20, .62);
+    --text: #f5f1ea;
+    --muted: #c9c1b6;
+    --line: rgba(255, 255, 255, .16);
+    --accent: #f07a1a;
+    --accent-soft: rgba(240, 122, 26, .14);
+    --accent-text: #14100c;
+    --blue: #2d8cff;
+    --blue-soft: rgba(45, 140, 255, .14);
+    --ok: #6fcf97;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0a0e1c; color: var(--text); font-family: "Rubik", system-ui, sans-serif; line-height: 1.5; }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1;
+    background:
+      linear-gradient(to bottom, rgba(6, 9, 20, .55) 0%, rgba(6, 9, 20, .85) 40%, rgba(6, 9, 20, .95) 100%),
+      url("bg.jpg") center top / cover no-repeat;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 28px 16px 64px; display: grid; gap: 16px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .eyebrow { margin: 0 0 4px; color: var(--accent); font-weight: 800; font-size: .8rem; letter-spacing: .12em; direction: ltr; text-align: right; }
+  h1 { margin: 0; font-size: 1.9rem; line-height: 1.2; }
+  h2 { margin: 0 0 12px; font-size: 1.2rem; }
+  h3 { margin: 0 0 8px; font-size: 1rem; }
+  .muted { color: var(--muted); }
+  .sub { margin: 4px 0 0; color: var(--muted); }
+
+  .tag { display: inline-block; font-size: .72rem; font-weight: 700; padding: 1px 8px; border-radius: 99px; white-space: nowrap; }
+  .tag.A { background: var(--accent-soft); color: #ffb57a; border: 1px solid rgba(240, 122, 26, .55); }
+  .tag.B { background: var(--blue-soft); color: #9cc8ff; border: 1px solid rgba(45, 140, 255, .55); }
+
+  .find label { display: block; font-weight: 500; margin-bottom: 6px; }
+  select {
+    width: 100%; font: inherit; color: var(--text); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  }
+  select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .mine { margin-top: 12px; display: grid; gap: 6px; }
+  .mine div { display: flex; gap: 10px; align-items: baseline; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+  .mine b.time { color: var(--accent); min-width: 3.2em; }
+  .mine .rest { color: var(--muted); }
+
+  .pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .pairs { grid-template-columns: 1fr; } }
+  .pairs ol { margin: 0; padding-inline-start: 1.5em; }
+  .pairs li { margin-bottom: 3px; }
+
+  .round + .round { margin-top: 18px; }
+  .round-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .round-head .time { font-size: 1.25rem; font-weight: 800; color: var(--accent); direction: ltr; }
+  .games { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 600px) { .games { grid-template-columns: 1fr; } }
+  .game {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+    display: grid; gap: 4px; transition: opacity .2s, border-color .2s;
+  }
+  .game .top { display: flex; justify-content: space-between; align-items: center; font-size: .8rem; color: var(--muted); }
+  .game .vs { font-size: .75rem; color: var(--muted); text-align: center; line-height: 1; }
+  .game .team { font-weight: 500; }
+  .game.hl { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .game .team.me { color: #ffc48f; font-weight: 700; }
+  .filtering .game:not(.hl) { opacity: .35; }
+  .rest-line { margin: 8px 0 0; font-size: .85rem; color: var(--muted); }
+
+  .bracket { display: grid; gap: 8px; }
+  .slot { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: baseline; }
+  .slot .time { font-weight: 800; color: var(--accent); direction: ltr; }
+  .ko { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .ko .top { font-size: .8rem; color: var(--muted); }
+  ul.rules { margin: 0; padding-inline-start: 1.2em; }
+  ul.rules li { margin-bottom: 4px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <header class="panel">
+    <p class="eyebrow">PADEL ACHIM · TOURNAMENT #4</p>
+    <h1>לוח משחקים</h1>
+    <p class="sub">יום ראשון, 8.11.2026 · קניון רננים, קומה 5 (על הגג) · 6 מגרשים · כל משחק 30 דקות</p>
+  </header>
+
+  <section class="panel find">
+    <label for="pick">🔎 מצאו את המשחקים של הזוג שלכם</label>
+    <select id="pick"><option value="">כל המשחקים</option></select>
+    <div class="mine" id="mine" hidden></div>
+  </section>
+
+  <section class="panel">
+    <h2>הזוגות</h2>
+    <div class="pairs">
+      <div><h3><span class="tag A">דרג א'</span> 9 זוגות</h3><ol id="list-A"></ol></div>
+      <div><h3><span class="tag B">דרג ב'</span> 5 זוגות</h3><ol id="list-B"></ol></div>
+    </div>
+  </section>
+
+  <section class="panel" id="league">
+    <h2>שלב הליגה</h2>
+    <p class="muted" style="margin:0 0 14px">כל זוג משחק 4 משחקים ונח סבב אחד. בדרג ב' כל זוג פוגש את כל השאר.</p>
+    <div id="rounds"></div>
+  </section>
+
+  <section class="panel">
+    <h2>שלב הנוקאאוט</h2>
+    <p class="muted" style="margin:0 0 14px">עולים 6 הזוגות הראשונים מדרג א' ו-2 הראשונים מדרג ב'.</p>
+    <div class="bracket" id="ko"></div>
+  </section>
+
+  <section class="panel">
+    <h2>חוקים</h2>
+    <ul class="rules">
+      <li>כל משחק 30 דקות, כולל חימום קצר. נא להגיע למגרש בזמן.</li>
+      <li>ניצחון = נקודה אחת. בשוויון בנקודות: הפרש משחקונים, ואז המפגש הישיר.</li>
+      <li>בעיות ושאלות: ניר זבולוני בלבד 😉</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+  const START = '17:00';      // first league round
+  const SLOT = 30;            // minutes per game
+  const KO_BREAK = 15;        // pause before the knockout stage
+
+  const DATA = {
+ "A": [
+  "ניר זבולוני + אלסנדרו כהן",
+  "יהודה + אליאור שרייבר",
+  "נאור חורב + גוש גייקובסון",
+  "חיים פין + דן דגני",
+  "קווין לוי + יוני כהן",
+  "אביאל סוקולובר + יוני עזרזר",
+  "אבישי פדלון + אורן אלימלך",
+  "אריאל גנץ + עדיאל הכט",
+  "שחר אלימלך + יואל שוואלב"
+ ],
+ "B": [
+  "גל השחר + מתנאל עזרזר",
+  "נתן הרץ + מתן ברוס",
+  "דן מארק + יוסי ניסני",
+  "מתן הורוביץ + בן שפיאלטר",
+  "אריק אלייני + אילן דמרי"
+ ],
+ "rounds": [
+  [
+   [
+    "A",
+    "ניר זבולוני + אלסנדרו כהן",
+    "יהודה + אליאור שרייבר"
+   ],
+   [
+    "A",
+    "נאור חורב + גוש גייקובסון",
+    "חיים פין + דן דגני"
+   ],
+   [
+    "A",
+    "קווין לוי + יוני כהן",
+    "אביאל סוקולובר + יוני עזרזר"
+   ],
+   [
+    "A",
+    "אבישי פדלון + אורן אלימלך",
+    "שחר אלימלך + יואל שוואלב"
+   ],
+   [
+    "B",
+    "גל השחר + מתנאל עזרזר",
+    "נתן הרץ + מתן ברוס"
+   ],
+   [
+    "B",
+    "דן מארק + יוסי ניסני",
+    "אריק אלייני + אילן דמרי"
+   ]
+  ],
+  [
+   [
+    "A",
+    "ניר זבולוני + אלסנדרו כהן",
+    "נאור חורב + גוש גייקובסון"
+   ],
+   [
+    "A",
+    "יהודה + אליאור שרייבר",
+    "חיים פין + דן דגני"
+   ],
+   [
+    "A",
+    "קווין לוי + יוני כהן",
+    "אבישי פדלון + אורן אלימלך"
+   ],
+   [
+    "A",
+    "אריאל גנץ + עדיאל הכט",
+    "שחר אלימלך + יואל שוואלב"
+   ],
+   [
+    "B",
+    "גל השחר + מתנאל עזרזר",
+    "דן מארק + יוסי ניסני"
+   ],
+   [
+    "B",
+    "מתן הורוביץ + בן שפיאלטר",
+    "אריק אלייני + אילן דמרי"
+   ]
+  ],
+  [
+   [
+    "A",
+    "ניר זבולוני + אלסנדרו כהן",
+    "אריאל גנץ + עדיאל הכט"
+   ],
+   [
+    "A",
+    "יהודה + אליאור שרייבר",
+    "נאור חורב + גוש גייקובסון"
+   ],
+   [
+    "A",
+    "חיים פין + דן דגני",
+    "קווין לוי + יוני כהן"
+   ],
+   [
+    "A",
+    "אביאל סוקולובר + יוני עזרזר",
+    "אבישי פדלון + אורן אלימלך"
+   ],
+   [
+    "B",
+    "גל השחר + מתנאל עזרזר",
+    "מתן הורוביץ + בן שפיאלטר"
+   ],
+   [
+    "B",
+    "נתן הרץ + מתן ברוס",
+    "דן מארק + יוסי ניסני"
+   ]
+  ],
+  [
+   [
+    "A",
+    "ניר זבולוני + אלסנדרו כהן",
+    "שחר אלימלך + יואל שוואלב"
+   ],
+   [
+    "A",
+    "נאור חורב + גוש גייקובסון",
+    "קווין לוי + יוני כהן"
+   ],
+   [
+    "A",
+    "חיים פין + דן דגני",
+    "אביאל סוקולובר + יוני עזרזר"
+   ],
+   [
+    "A",
+    "אבישי פדלון + אורן אלימלך",
+    "אריאל גנץ + עדיאל הכט"
+   ],
+   [
+    "B",
+    "גל השחר + מתנאל עזרזר",
+    "אריק אלייני + אילן דמרי"
+   ],
+   [
+    "B",
+    "נתן הרץ + מתן ברוס",
+    "מתן הורוביץ + בן שפיאלטר"
+   ]
+  ],
+  [
+   [
+    "A",
+    "יהודה + אליאור שרייבר",
+    "שחר אלימלך + יואל שוואלב"
+   ],
+   [
+    "A",
+    "אביאל סוקולובר + יוני עזרזר",
+    "אריאל גנץ + עדיאל הכט"
+   ],
+   [
+    "B",
+    "נתן הרץ + מתן ברוס",
+    "אריק אלייני + אילן דמרי"
+   ],
+   [
+    "B",
+    "דן מארק + יוסי ניסני",
+    "מתן הורוביץ + בן שפיאלטר"
+   ]
+  ]
+ ]
+};
+
+  const $ = (id) => document.getElementById(id);
+  const toMin = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  const fmt = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const tag = (t) => el('span', `tag ${t}`, t === 'A' ? "דרג א'" : "דרג ב'");
+
+  const roundTime = (r) => fmt(toMin(START) + r * SLOT);
+  const koStart = toMin(START) + DATA.rounds.length * SLOT + KO_BREAK;
+
+  for (const t of ['A', 'B']) $(`list-${t}`).append(...DATA[t].map((p) => el('li', null, p)));
+  const pick = $('pick');
+  for (const t of ['A', 'B']) {
+    const g = document.createElement('optgroup');
+    g.label = t === 'A' ? "דרג א'" : "דרג ב'";
+    g.append(...DATA[t].map((p) => new Option(p, p)));
+    pick.append(g);
+  }
+
+  const gameEls = [];
+  DATA.rounds.forEach((games, r) => {
+    const box = el('div', 'round');
+    const head = el('div', 'round-head');
+    head.append(el('span', 'time', roundTime(r)), el('b', null, `סבב ${r + 1}`));
+    const grid = el('div', 'games');
+    games.forEach(([t, x, y], c) => {
+      const g = el('div', 'game');
+      const top = el('div', 'top');
+      top.append(el('span', null, `מגרש ${c + 1}`), tag(t));
+      const tx = el('div', 'team', x), ty = el('div', 'team', y);
+      g.append(top, tx, el('div', 'vs', 'נגד'), ty);
+      g.dataset.teams = JSON.stringify([x, y]);
+      gameEls.push({ g, x, y, tx, ty });
+      grid.append(g);
+    });
+    const playing = new Set(games.flatMap(([, x, y]) => [x, y]));
+    const resting = [...DATA.A, ...DATA.B].filter((p) => !playing.has(p));
+    box.append(head, grid, el('p', 'rest-line', `נחים בסבב: ${resting.join(' · ')}`));
+    $('rounds').append(box);
+  });
+
+  const ko = [
+    ['רבע גמר', 0, [["מקום 1 דרג א'", "מקום 2 דרג ב'"], ["מקום 2 דרג א'", "מקום 1 דרג ב'"], ["מקום 3 דרג א'", "מקום 6 דרג א'"], ["מקום 4 דרג א'", "מקום 5 דרג א'"]]],
+    ['חצי גמר', 1, [['מנצחת רבע 1', 'מנצחת רבע 4'], ['מנצחת רבע 2', 'מנצחת רבע 3']]],
+    ['גמר 🏆', 2, [['מנצחת חצי 1', 'מנצחת חצי 2'], ['מפסידת חצי 1', 'מפסידת חצי 2']]],
+  ];
+  for (const [name, i, games] of ko) {
+    const slot = el('div', 'slot');
+    slot.append(el('span', 'time', fmt(koStart + i * SLOT)), el('b', null, name));
+    const grid = el('div', 'games');
+    grid.style.gridColumn = '1 / -1';
+    games.forEach(([x, y], c) => {
+      const g = el('div', 'ko');
+      const label = name.startsWith('גמר') ? (c === 0 ? 'גמר' : 'מקום 3') : `${name} ${c + 1}`;
+      g.append(el('div', 'top', `מגרש ${c + 1} · ${label}`), el('div', null, `${x} נגד ${y}`));
+      grid.append(g);
+    });
+    slot.append(grid);
+    $('ko').append(slot);
+  }
+  $('ko').append(el('p', 'muted', `סיום משוער: ${fmt(koStart + 3 * SLOT)}`));
+
+  function applyPick(p) {
+    document.body.classList.toggle('filtering', !!p);
+    for (const { g, x, y, tx, ty } of gameEls) {
+      const hit = p && (x === p || y === p);
+      g.classList.toggle('hl', !!hit);
+      tx.classList.toggle('me', x === p);
+      ty.classList.toggle('me', y === p);
+    }
+    const mine = $('mine');
+    mine.replaceChildren();
+    mine.hidden = !p;
+    if (!p) return;
+    DATA.rounds.forEach((games, r) => {
+      const game = games.findIndex(([, x, y]) => x === p || y === p);
+      const row = el('div');
+      row.append(el('b', 'time', roundTime(r)));
+      if (game === -1) row.append(el('span', 'rest', 'מנוחה 😴'));
+      else {
+        const [, x, y] = games[game];
+        row.append(el('span', null, `מגרש ${game + 1} · נגד ${x === p ? y : x}`));
+      }
+      mine.append(row);
+    });
+  }
+  pick.addEventListener('change', () => {
+    applyPick(pick.value);
+    try { localStorage.setItem('myPair', pick.value); } catch {}
+  });
+  try {
+    const saved = localStorage.getItem('myPair');
+    if (saved && [...DATA.A, ...DATA.B].includes(saved)) { pick.value = saved; applyPick(saved); }
+  } catch {}
+</script>
+</body>
+</html>
