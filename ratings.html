@@ -125,7 +125,7 @@
   .result p { margin: 0 0 4px; color: var(--muted); }
   .result .match { font-size: 2rem; font-weight: 900; color: var(--text); direction: ltr; }
   .stamp {
-    position: absolute; z-index: 4; bottom: 18px; left: 50%; transform: translateX(-50%) rotate(-8deg);
+    position: absolute; z-index: 4; top: 22px; left: 50%; transform: translateX(-50%) rotate(-8deg);
     padding: 4px 16px; border: 3px solid var(--err); border-radius: 10px; color: var(--err);
     font-weight: 900; font-size: 1.3rem; background: rgba(10, 0, 0, .55); white-space: nowrap;
   }
@@ -196,7 +196,7 @@
       <div class="oval" id="oval"></div>
       <div class="line" id="line"></div>
       <video id="video" playsinline muted></video>
-      <img id="shot" alt="התמונה שצולמה" hidden>
+      <img id="shot" alt="תוצאת הסריקה" hidden>
       <div class="stamp" id="stamp" hidden>לא מורשה</div>
     </div>
     <div id="scanning">
@@ -298,6 +298,8 @@
   });
   /* ---------- "face recognition" (camera only, nothing leaves the device) ---------- */
   let stream = null, run = 0;
+  const RESULT_IMG = new Image();
+  RESULT_IMG.src = 'scan-result.jpg'; // preload so it appears instantly
   const STEPS = [
     [0, 'ממקם פנים במסגרת…'],
     [18, 'מזהה תווי פנים…'],
@@ -358,15 +360,8 @@
     });
     if (my !== run) return;
 
-    // freeze the frame and put the photo on screen
-    const c = document.createElement('canvas');
-    c.width = video.videoWidth || 640;
-    c.height = video.videoHeight || 480;
-    const ctx = c.getContext('2d');
-    ctx.translate(c.width, 0);
-    ctx.scale(-1, 1);
-    ctx.drawImage(video, 0, 0, c.width, c.height);
-    $('shot').src = c.toDataURL('image/jpeg', .9);
+    // the "scan result" is a fixed photo, not the camera frame
+    $('shot').src = RESULT_IMG.src;
     stopCamera();
 
     $('video').hidden = true;
@@ -387,7 +382,6 @@
     run++;
     stopCamera();
     $('scan').hidden = true;
-    $('shot').removeAttribute('src');
   }
 
   $('face').addEventListener('click', startScan);
