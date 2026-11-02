@@ -65,12 +65,12 @@
   .row input { width: auto; accent-color: var(--accent); }
   .row a { color: #9cc8ff; text-decoration: none; }
   button.go {
-    width: 100%; font: inherit; font-weight: 800; font-size: 1.05rem; padding: 12px;
-    border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-text); cursor: pointer;
+    width: 100%; font: inherit; font-weight: 700; font-size: 1rem; padding: 11px;
+    border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--text); cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   button.go:disabled { opacity: .6; cursor: wait; }
-  .spin { width: 18px; height: 18px; border: 2.5px solid rgba(20, 16, 12, .3); border-top-color: var(--accent-text); border-radius: 50%; animation: spin .7s linear infinite; }
+  .spin { width: 18px; height: 18px; border: 2.5px solid rgba(255, 255, 255, .25); border-top-color: var(--text); border-radius: 50%; animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .msg { min-height: 1.5em; margin-top: 12px; color: var(--err); text-align: center; font-size: .92rem; }
   .shake { animation: shake .35s; }
@@ -85,11 +85,15 @@
   .or { display: flex; align-items: center; gap: 10px; margin: 18px 0 14px; color: var(--muted); font-size: .85rem; }
   .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
   button.face-btn {
-    width: 100%; font: inherit; font-weight: 700; padding: 11px; border-radius: 10px; cursor: pointer;
-    border: 1px solid var(--blue); background: rgba(45, 140, 255, .12); color: #9cc8ff;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; font: inherit; font-weight: 800; font-size: 1.1rem; padding: 14px; border-radius: 12px; cursor: pointer;
+    border: 0; background: linear-gradient(135deg, var(--accent), #ffa04d); color: var(--accent-text);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 0 8px 26px rgba(240, 122, 26, .35); animation: pulse 2.2s ease-in-out infinite;
   }
-  button.face-btn svg { width: 22px; height: 22px; }
+  button.face-btn svg { width: 26px; height: 26px; }
+  @keyframes pulse { 50% { box-shadow: 0 8px 34px rgba(240, 122, 26, .6); } }
+  .face-note { margin: 10px 0 0; text-align: center; font-size: .85rem; color: var(--muted); display: flex; gap: 6px; justify-content: center; align-items: center; }
+  .face-note .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok, #6fcf97); box-shadow: 0 0 8px #6fcf97; flex: none; }
 
   .scan { position: fixed; inset: 0; z-index: 10; background: rgba(4, 6, 14, .96); display: grid; place-items: center; padding: 20px; }
   .scan-inner { width: 100%; max-width: 420px; text-align: center; }
@@ -149,6 +153,12 @@
 
   <!-- Nothing typed here is sent or stored anywhere: every attempt "fails". -->
   <form id="form" autocomplete="off" novalidate>
+    <button class="face-btn" type="button" id="face">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M9 10h.01M15 10h.01"/><path d="M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>
+      כניסה עם זיהוי פנים
+    </button>
+    <p class="face-note"><span class="dot"></span>פני כל שחקני הטורניר מופו במערכת</p>
+    <div class="or">או התחברות עם סיסמה</div>
     <div class="field">
       <label for="user">טלפון או שם משתמש</label>
       <input id="user" type="tel" inputmode="tel" autocomplete="off">
@@ -166,11 +176,6 @@
     </div>
     <button class="go" type="submit" id="go">כניסה</button>
     <div class="msg" id="msg" role="alert"></div>
-    <div class="or">או</div>
-    <button class="face-btn" type="button" id="face">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M9 10h.01M15 10h.01"/><path d="M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>
-      כניסה עם זיהוי פנים
-    </button>
   </form>
 
   <div class="locked" id="locked" hidden>
