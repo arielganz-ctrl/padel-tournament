@@ -119,7 +119,7 @@
     <div class="ico">🔒</div>
     <h2>החשבון ננעל</h2>
     <p>זוהו יותר מדי ניסיונות התחברות שגויים.</p>
-    <div class="timer" id="timer">23:59:59</div>
+    <div class="timer" id="timer">01:00</div>
     <p>לשחרור החשבון יש לפנות למנהל המערכת: <b style="color:var(--text)">אריאל גנץ</b>.</p>
   </div>
 
@@ -132,12 +132,25 @@
 <script>
   const $ = (id) => document.getElementById(id);
   const MAX_TRIES = 3;
-  const LOCK_MS = 24 * 60 * 60 * 1000;
+  const LOCK_MS = 60 * 1000;
   let tries = 0;
 
   // The lock survives a refresh, so reloading doesn't "fix" it.
   function lockedUntil() {
-    try { return Number(localStorage.getItem('ratingsLockedUntil')) || 0; } catch { return 0; }
+    let t = 0;
+    try { t = Number(localStorage.getItem('ratingsLockedUntil')) || 0; } catch {}
+    // locks saved back when they lasted 24h shrink to the current length
+    return Math.min(t, Date.now() + LOCK_MS);
+  }
+
+  let timer;
+  function unlock() {
+    clearInterval(timer);
+    try { localStorage.removeItem('ratingsLockedUntil'); } catch {}
+    tries = 0;
+    $('msg').textContent = '';
+    $('locked').hidden = true;
+    $('form').hidden = false;
   }
 
   function showLocked() {
@@ -145,12 +158,12 @@
     $('locked').hidden = false;
     const tick = () => {
       const left = Math.max(0, lockedUntil() - Date.now());
-      const s = Math.floor(left / 1000);
-      $('timer').textContent = [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60]
-        .map((n) => String(n).padStart(2, '0')).join(':');
+      const s = Math.ceil(left / 1000);
+      $('timer').textContent = [Math.floor(s / 60), s % 60].map((n) => String(n).padStart(2, '0')).join(':');
+      if (!left) unlock();
     };
     tick();
-    setInterval(tick, 1000);
+    timer = setInterval(tick, 1000);
   }
 
   if (lockedUntil() > Date.now()) showLocked();
