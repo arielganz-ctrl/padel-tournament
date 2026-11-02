@@ -137,7 +137,8 @@
   .scan .actions button { flex: 1; }
   .scan .actions button { font: inherit; font-weight: 700; padding: 11px; border-radius: 10px; cursor: pointer; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
   .scan .actions button.primary { background: var(--accent); color: var(--accent-text); border: 0; }
-  .result .bye { font-size: 1.8rem; font-weight: 900; color: var(--text); }
+  .result .bye { font-size: 1.7rem; font-weight: 900; color: var(--text); line-height: 1.25; }
+  .result .bye-sub { margin-top: 6px; font-size: 1.15rem; font-weight: 500; color: #ffc48f; }
   .note-local { margin-top: 14px; font-size: .75rem; color: var(--muted); }
   [hidden] { display: none !important; }
 </style>
@@ -210,7 +211,8 @@
       <div class="pbar"><span id="pbar"></span></div>
     </div>
     <div class="result" id="result" hidden>
-      <div class="bye">נתראה במגרש</div>
+      <div class="bye">חברים לא מדרגים חברים</div>
+      <div class="bye-sub">תבואו להנות, נתראה במגרש 🎾</div>
     </div>
     <div class="actions" id="actions">
       <button type="button" id="scan-close">ביטול</button>
