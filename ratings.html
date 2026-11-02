@@ -133,6 +133,7 @@
   .scan .actions button { flex: 1; }
   .scan .actions button { font: inherit; font-weight: 700; padding: 11px; border-radius: 10px; cursor: pointer; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
   .scan .actions button.primary { background: var(--accent); color: var(--accent-text); border: 0; }
+  .result .bye { font-size: 1.8rem; font-weight: 900; color: var(--text); }
   .note-local { margin-top: 14px; font-size: .75rem; color: var(--muted); }
   [hidden] { display: none !important; }
 </style>
@@ -204,15 +205,13 @@
       <div class="pbar"><span id="pbar"></span></div>
     </div>
     <div class="result" id="result" hidden>
-      <div class="match">12%</div>
-      <h3>❌ הפנים לא זוהו כמשתמש מורשה</h3>
-      <p>לקבלת הרשאת צפייה יש לפנות לאריאל גנץ.</p>
+      <div class="bye">נתראה במגרש</div>
     </div>
     <div class="actions" id="actions">
       <button type="button" id="scan-close">ביטול</button>
       <button type="button" class="primary" id="scan-again" hidden>סריקה חוזרת</button>
     </div>
-    <p class="note-local">התמונה מוצגת רק במכשיר שלכם ולא נשמרת או נשלחת לשום מקום.</p>
+    <p class="note-local" id="note-local">התמונה מוצגת רק במכשיר שלכם ולא נשמרת או נשלחת לשום מקום.</p>
   </div>
 </div>
 
@@ -323,6 +322,7 @@
     $('dots').hidden = false;
     $('scanning').hidden = false;
     $('result').hidden = true;
+    $('note-local').hidden = false;
     $('scan-again').hidden = true;
     $('scan-close').textContent = 'ביטול';
     $('scan-title').textContent = 'זיהוי פנים';
@@ -373,6 +373,7 @@
     $('stamp').hidden = false;
     $('scanning').hidden = true;
     $('result').hidden = false;
+    $('note-local').hidden = true;
     $('scan-title').textContent = 'תוצאת הסריקה';
     $('scan-sub').textContent = '';
     $('scan-again').hidden = false;
