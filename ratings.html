@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>דירוג שחקנים · כניסה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800;900&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: rgba(10, 14, 28, .55);
+    --card: rgba(16, 20, 36, .86);
+    --text: #f5f1ea;
+    --muted: #c9c1b6;
+    --line: rgba(255, 255, 255, .16);
+    --accent: #f07a1a;
+    --accent-text: #14100c;
+    --blue: #2d8cff;
+    --err: #ff8a80;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: grid; place-items: center;
+    background: #0a0e1c; color: var(--text); font-family: "Rubik", system-ui, sans-serif; line-height: 1.5;
+    padding: 24px 16px;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1;
+    background:
+      linear-gradient(to bottom, rgba(6, 9, 20, .55), rgba(6, 9, 20, .92)),
+      url("bg.jpg") center top / cover no-repeat;
+  }
+  .box {
+    width: 100%; max-width: 400px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+    padding: 28px 24px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+  }
+  .logo {
+    width: 56px; height: 56px; margin: 0 auto 12px; border-radius: 16px;
+    display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), #ffb15c);
+    color: var(--accent-text);
+  }
+  .logo svg { width: 30px; height: 30px; }
+  .eyebrow { margin: 0; text-align: center; color: var(--accent); font-weight: 800; font-size: .72rem; letter-spacing: .14em; direction: ltr; }
+  h1 { margin: 4px 0 2px; text-align: center; font-size: 1.8rem; font-weight: 900; }
+  .sub { margin: 0 0 22px; text-align: center; color: var(--muted); font-size: .92rem; }
+  label { display: block; font-size: .9rem; margin-bottom: 5px; }
+  .field { margin-bottom: 14px; position: relative; }
+  input {
+    width: 100%; font: inherit; color: var(--text); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px;
+  }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  input[type="tel"], input[type="password"], input.pw { direction: ltr; text-align: right; }
+  .eye {
+    position: absolute; left: 8px; bottom: 7px; width: 32px; height: 32px; border: 0; border-radius: 8px;
+    background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center;
+  }
+  .eye svg { width: 20px; height: 20px; }
+  .row { display: flex; justify-content: space-between; align-items: center; font-size: .85rem; margin: -2px 0 18px; }
+  .row label { display: flex; gap: 6px; align-items: center; margin: 0; color: var(--muted); }
+  .row input { width: auto; accent-color: var(--accent); }
+  .row a { color: #9cc8ff; text-decoration: none; }
+  button.go {
+    width: 100%; font: inherit; font-weight: 800; font-size: 1.05rem; padding: 12px;
+    border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  button.go:disabled { opacity: .6; cursor: wait; }
+  .spin { width: 18px; height: 18px; border: 2.5px solid rgba(20, 16, 12, .3); border-top-color: var(--accent-text); border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .msg { min-height: 1.5em; margin-top: 12px; color: var(--err); text-align: center; font-size: .92rem; }
+  .shake { animation: shake .35s; }
+  @keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+  .locked { text-align: center; }
+  .locked .ico { font-size: 2.6rem; }
+  .locked h2 { margin: 6px 0; color: var(--err); }
+  .locked p { margin: 0 0 6px; color: var(--muted); }
+  .locked .timer { font-size: 1.6rem; font-weight: 800; color: var(--text); direction: ltr; margin: 10px 0; font-variant-numeric: tabular-nums; }
+  .foot { margin-top: 18px; text-align: center; font-size: .78rem; color: var(--muted); display: flex; justify-content: center; gap: 6px; align-items: center; }
+  .foot svg { width: 14px; height: 14px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main class="box" id="box">
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+  </div>
+  <p class="eyebrow">PADEL ACHIM · PLAYER RATINGS</p>
+  <h1>דירוג שחקנים</h1>
+  <p class="sub">אזור מורשים בלבד. התחברו כדי לצפות בדירוג המלא.</p>
+
+  <!-- Nothing typed here is sent or stored anywhere: every attempt "fails". -->
+  <form id="form" autocomplete="off" novalidate>
+    <div class="field">
+      <label for="user">טלפון או שם משתמש</label>
+      <input id="user" type="tel" inputmode="tel" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="pw">סיסמה</label>
+      <input id="pw" type="password" autocomplete="off">
+      <button class="eye" type="button" id="eye" aria-label="הצגת סיסמה">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="row">
+      <label><input type="checkbox"> זכור אותי</label>
+      <a href="#" id="forgot">שכחתי סיסמה</a>
+    </div>
+    <button class="go" type="submit" id="go">כניסה</button>
+    <div class="msg" id="msg" role="alert"></div>
+  </form>
+
+  <div class="locked" id="locked" hidden>
+    <div class="ico">🔒</div>
+    <h2>החשבון ננעל</h2>
+    <p>זוהו יותר מדי ניסיונות התחברות שגויים.</p>
+    <div class="timer" id="timer">23:59:59</div>
+    <p>לשחרור החשבון יש לפנות למנהל המערכת: <b style="color:var(--text)">ניר זבולוני</b>.</p>
+  </div>
+
+  <div class="foot">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    חיבור מאובטח · PADEL ACHIM © 2026
+  </div>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const MAX_TRIES = 3;
+  const LOCK_MS = 24 * 60 * 60 * 1000;
+  let tries = 0;
+
+  // The lock survives a refresh, so reloading doesn't "fix" it.
+  function lockedUntil() {
+    try { return Number(localStorage.getItem('ratingsLockedUntil')) || 0; } catch { return 0; }
+  }
+
+  function showLocked() {
+    $('form').hidden = true;
+    $('locked').hidden = false;
+    const tick = () => {
+      const left = Math.max(0, lockedUntil() - Date.now());
+      const s = Math.floor(left / 1000);
+      $('timer').textContent = [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60]
+        .map((n) => String(n).padStart(2, '0')).join(':');
+    };
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  if (lockedUntil() > Date.now()) showLocked();
+
+  $('eye').addEventListener('click', () => {
+    const pw = $('pw');
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+    pw.classList.toggle('pw', pw.type === 'text');
+  });
+
+  $('forgot').addEventListener('click', (e) => {
+    e.preventDefault();
+    $('msg').textContent = 'לשחזור סיסמה יש לפנות לניר זבולוני.';
+  });
+
+  $('form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const msg = $('msg'), go = $('go');
+    msg.textContent = '';
+    if (!$('user').value.trim() || !$('pw').value) {
+      msg.textContent = 'יש למלא שם משתמש וסיסמה.';
+      return;
+    }
+    go.disabled = true;
+    go.replaceChildren(Object.assign(document.createElement('span'), { className: 'spin' }), 'מתחבר…');
+    // look like we're checking with a server
+    setTimeout(() => {
+      tries++;
+      go.disabled = false;
+      go.textContent = 'כניסה';
+      $('pw').value = '';
+      if (tries >= MAX_TRIES) {
+        try { localStorage.setItem('ratingsLockedUntil', String(Date.now() + LOCK_MS)); } catch {}
+        showLocked();
+        return;
+      }
+      const left = MAX_TRIES - tries;
+      msg.textContent = `שם המשתמש או הסיסמה שגויים. ${left === 1 ? 'נותר ניסיון אחד' : `נותרו ${left} ניסיונות`}.`;
+      const box = $('box');
+      box.classList.remove('shake');
+      void box.offsetWidth;
+      box.classList.add('shake');
+      $('pw').focus();
+    }, 900 + Math.random() * 900);
+  });
+</script>
+</body>
+</html>
