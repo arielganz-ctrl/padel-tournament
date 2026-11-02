@@ -224,10 +224,7 @@
 
   // The lock survives a refresh, so reloading doesn't "fix" it.
   function lockedUntil() {
-    let t = 0;
-    try { t = Number(localStorage.getItem('ratingsLockedUntil')) || 0; } catch {}
-    // locks saved back when they lasted 24h shrink to the current length
-    return Math.min(t, Date.now() + LOCK_MS);
+    try { return Number(localStorage.getItem('ratingsLockedUntil')) || 0; } catch { return 0; }
   }
 
   let timer;
@@ -253,6 +250,10 @@
     timer = setInterval(tick, 1000);
   }
 
+  // locks saved back when they lasted 24h shrink to the current length, once
+  if (lockedUntil() > Date.now() + LOCK_MS) {
+    try { localStorage.setItem('ratingsLockedUntil', String(Date.now() + LOCK_MS)); } catch {}
+  }
   if (lockedUntil() > Date.now()) showLocked();
 
   $('eye').addEventListener('click', () => {
