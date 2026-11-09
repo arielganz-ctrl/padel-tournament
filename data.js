@@ -1,12 +1,16 @@
 // Tournament data shared by every page.
 // A/B = the pairs in each house; rounds = group games as [house, pair, pair],
 // position in the round = court - 1. Game ids are R<round>C<court> (see tournament.js).
-// start/slot/koBreak: first game time, minutes per slot, break before the knockout.
+// start/slot: first game time and minutes per round. groupCourts: court number for each position in a round.
+// koTimes: start of each knockout stage (QF, SF, 3rd place, final); koCourts: court per knockout game.
 window.TOURNAMENT = {
  "scriptUrl": "https://script.google.com/macros/s/AKfycbyV2BAO9fzSXQZCQuPR39qiSjyKm1rH2XspfbrRVDG1QuXZqznqPJBjRzqghfKwr9OezQ/exec",
  "start": "17:30",
  "slot": 30,
  "koBreak": 30,
+ "groupCourts": [7, 8, 9, 10, 11, 12],
+ "koTimes": ["21:00", "21:30", "22:00", "22:30"],
+ "koCourts": {"QF1": 7, "QF2": 8, "QF3": 11, "QF4": 12, "SF1": 11, "SF2": 12, "P3": 11, "F": 1},
  "A": [
   "יהודה הלוי + אליאור שרייבר",
   "נאור חורב + גוש גייקובסון",

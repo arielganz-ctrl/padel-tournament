@@ -7,11 +7,12 @@
   const fmt = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
   const roundStart = (r) => toMin(T.start) + r * T.slot;
-  const koStart = (stage) => roundStart(T.rounds.length) + T.koBreak + stage * T.slot;
+  const koStart = (stage) => (T.koTimes ? toMin(T.koTimes[stage]) : roundStart(T.rounds.length) + T.koBreak + stage * T.slot);
+  const groupCourt = (c) => (T.groupCourts && T.groupCourts[c]) || c + 1;
 
   // group stage: every game gets a stable id from its round and court
   const games = T.rounds.flatMap((round, r) => round.map(([house, x, y], c) => ({
-    id: `R${r + 1}C${c + 1}`, stage: 'group', round: r, court: c + 1, house, x, y, time: fmt(roundStart(r)),
+    id: `R${r + 1}C${c + 1}`, stage: 'group', round: r, court: groupCourt(c), house, x, y, time: fmt(roundStart(r)),
   })));
 
   // knockout: side 1 = QF1 + QF2 -> SF1, side 2 = QF3 + QF4 -> SF2
@@ -22,10 +23,10 @@
     { id: 'QF4', stage: 0, court: 4, name: 'רבע גמר 4', side: 2, from: [['seed', 'A', 4], ['seed', 'A', 5]] },
     { id: 'SF1', stage: 1, court: 1, name: 'חצי גמר 1', side: 1, from: [['win', 'QF1'], ['win', 'QF2']] },
     { id: 'SF2', stage: 1, court: 2, name: 'חצי גמר 2', side: 2, from: [['win', 'QF3'], ['win', 'QF4']] },
-    { id: 'F', stage: 2, court: 1, name: 'גמר 🏆', from: [['win', 'SF1'], ['win', 'SF2']] },
     { id: 'P3', stage: 2, court: 2, name: 'מקום 3', from: [['lose', 'SF1'], ['lose', 'SF2']] },
-  ].map((g) => ({ ...g, time: fmt(koStart(g.stage)) }));
-  const KO_STAGES = ['רבע גמר', 'חצי גמר', 'גמר ומקום 3'];
+    { id: 'F', stage: 3, court: 1, name: 'גמר 🏆', from: [['win', 'SF1'], ['win', 'SF2']] },
+  ].map((g) => ({ ...g, court: (T.koCourts && T.koCourts[g.id]) || g.court, time: fmt(koStart(g.stage)) }));
+  const KO_STAGES = ['רבע גמר', 'חצי גמר', 'מקום 3', 'גמר 🏆'];
   const QUALIFY = { A: 6, B: 2 };
 
   const num = (v) => (v === '' || v == null || isNaN(Number(v)) ? null : Number(v));
