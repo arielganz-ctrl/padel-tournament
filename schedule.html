@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>לוח משחקים</title>
+<title>לוח משחקים וטבלה</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap">
 <style>
@@ -35,56 +35,71 @@
   .eyebrow { margin: 0 0 4px; color: var(--accent); font-weight: 800; font-size: .8rem; letter-spacing: .12em; direction: ltr; text-align: right; }
   h1 { margin: 0; font-size: 1.9rem; line-height: 1.2; }
   h2 { margin: 0 0 12px; font-size: 1.2rem; }
-  h3 { margin: 0 0 8px; font-size: 1rem; }
+  h3 { margin: 0 0 8px; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
   .muted { color: var(--muted); }
   .sub { margin: 4px 0 0; color: var(--muted); }
+  .back { display: inline-block; margin-bottom: 10px; color: #9cc8ff; text-decoration: none; font-size: .9rem; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .toolbar a {
+    font-size: .88rem; color: var(--text); text-decoration: none; border: 1px solid var(--line);
+    background: var(--bg); border-radius: 99px; padding: 5px 12px;
+  }
+  .live { font-size: .8rem; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+  .live i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .live.off i { background: #888; box-shadow: none; }
 
   .tag { display: inline-block; font-size: .72rem; font-weight: 700; padding: 1px 8px; border-radius: 99px; white-space: nowrap; }
   .tag.A { background: var(--accent-soft); color: #ffb57a; border: 1px solid rgba(240, 122, 26, .55); }
   .tag.B { background: var(--blue-soft); color: #9cc8ff; border: 1px solid rgba(45, 140, 255, .55); }
 
   .find label { display: block; font-weight: 500; margin-bottom: 6px; }
-  select {
-    width: 100%; font: inherit; color: var(--text); background: var(--bg);
-    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
-  }
+  select { width: 100%; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
   select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
   .mine { margin-top: 12px; display: grid; gap: 6px; }
   .mine div { display: flex; gap: 10px; align-items: baseline; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
   .mine b.time { color: var(--accent); min-width: 3.2em; }
   .mine .rest { color: var(--muted); }
+  .mine .res { margin-inline-start: auto; font-weight: 700; direction: ltr; }
 
-  .pairs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 600px) { .pairs { grid-template-columns: 1fr; } }
-  .pairs ol { margin: 0; padding-inline-start: 1.5em; }
-  .pairs li { margin-bottom: 3px; }
+  /* standings */
+  .tables { display: grid; gap: 18px; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th { font-weight: 500; color: var(--muted); font-size: .78rem; text-align: center; padding: 4px 2px; }
+  th.l, td.l { text-align: right; }
+  td { padding: 7px 2px; text-align: center; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  td.pos { width: 2em; font-weight: 800; }
+  td.l { font-weight: 500; }
+  td.pts { font-weight: 800; color: #ffc48f; }
+  tr.q td.pos { color: var(--ok); }
+  tr.q { background: rgba(111, 207, 151, .07); }
+  tr.cut td { border-top: 2px dashed rgba(111, 207, 151, .6); }
+  tr.me { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .legend { font-size: .78rem; color: var(--muted); margin-top: 6px; }
+  .legend b { color: var(--ok); }
 
+  /* games */
   .round + .round { margin-top: 18px; }
   .round-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
   .round-head .time { font-size: 1.25rem; font-weight: 800; color: var(--accent); direction: ltr; }
   .games { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   @media (max-width: 600px) { .games { grid-template-columns: 1fr; } }
-  .game {
-    background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
-    display: grid; gap: 4px; transition: opacity .2s, border-color .2s;
-  }
+  .game { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; gap: 4px; transition: opacity .2s, border-color .2s; }
   .game .top { display: flex; justify-content: space-between; align-items: center; font-size: .8rem; color: var(--muted); }
-  .game .vs { font-size: .75rem; color: var(--muted); text-align: center; line-height: 1; }
-  .game .team { font-weight: 500; }
+  .team { display: flex; justify-content: space-between; gap: 8px; font-weight: 500; }
+  .team .s { font-weight: 800; min-width: 1.4em; text-align: center; font-variant-numeric: tabular-nums; }
+  .team.won { color: #fff; }
+  .team.won .s { color: var(--ok); }
+  .team.lost { color: var(--muted); }
+  .vs { font-size: .75rem; color: var(--muted); text-align: center; line-height: 1; }
   .game.hl { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-  .game .team.me { color: #ffc48f; font-weight: 700; }
+  .team.me { color: #ffc48f; font-weight: 700; }
   .filtering .game:not(.hl) { opacity: .35; }
   .rest-line { margin: 8px 0 0; font-size: .85rem; color: var(--muted); }
+  .tbd { color: var(--muted); font-style: italic; font-weight: 400; }
 
-  .bracket { display: grid; gap: 8px; }
-  .slot { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: baseline; }
-  .slot .time { font-weight: 800; color: var(--accent); direction: ltr; }
-  .ko { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
-  .ko .top { font-size: .8rem; color: var(--muted); }
+  .side { font-size: .82rem; color: var(--muted); margin: 2px 0 6px; }
   ul.rules { margin: 0; padding-inline-start: 1.2em; }
   ul.rules li { margin-bottom: 4px; }
-  .back { display: inline-block; margin-bottom: 10px; color: #9cc8ff; text-decoration: none; font-size: .9rem; }
-  .back:hover { text-decoration: underline; }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -93,8 +108,15 @@
   <header class="panel">
     <a class="back" href="./">→ לעמוד הטורניר</a>
     <p class="eyebrow">PADEL ACHIM · TOURNAMENT #4</p>
-    <h1>לוח משחקים</h1>
-    <p class="sub">יום ראשון, 8.11.2026 · קניון רננים, קומה 5 (על הגג) · 5 מגרשים · כל משחק 30 דקות</p>
+    <h1>לוח משחקים וטבלה</h1>
+    <p class="sub" id="sub"></p>
+    <div class="toolbar">
+      <a href="#tables">📊 הטבלה</a>
+      <a href="#league">🎾 שלב הבתים</a>
+      <a href="#ko">🏆 נוקאאוט</a>
+      <a href="print.html">🖨️ הדפסה לפי מגרש</a>
+    </div>
+    <div class="live off" id="live"><i></i><span id="live-text">טוען תוצאות…</span></div>
   </header>
 
   <section class="panel find">
@@ -103,12 +125,9 @@
     <div class="mine" id="mine" hidden></div>
   </section>
 
-  <section class="panel">
-    <h2>הזוגות</h2>
-    <div class="pairs">
-      <div><h3><span class="tag A">בית A</span> 9 זוגות</h3><ol id="list-A"></ol></div>
-      <div><h3><span class="tag B">בית B</span> 5 זוגות</h3><ol id="list-B"></ol></div>
-    </div>
+  <section class="panel" id="tables">
+    <h2>הטבלה</h2>
+    <div class="tables" id="standings"></div>
   </section>
 
   <section class="panel" id="league">
@@ -117,112 +136,186 @@
     <div id="rounds"></div>
   </section>
 
-  <section class="panel">
+  <section class="panel" id="ko">
     <h2>שלב הנוקאאוט</h2>
     <p class="muted" style="margin:0 0 14px">עולים 6 הזוגות הראשונים מבית A ו-2 הראשונים מבית B.</p>
-    <div class="bracket" id="ko"></div>
+    <div id="bracket"></div>
   </section>
 
   <section class="panel">
     <h2>חוקים</h2>
     <ul class="rules">
-      <li><b>שלב הבתים:</b> הטוב מ-7 משחקונים. ב-3:3 משחקים טייברייק עד 7 נקודות.</li>
+      <li><b>שלב הבתים:</b> משחק עד 5 משחקונים. ב-4:4 משחקים טייברייק עד 7 נקודות.</li>
       <li><b>מרבע הגמר והלאה:</b> הטוב מ-11 משחקונים. ב-5:5 משחקים טייברייק עד 7 נקודות.</li>
-      <li>כל סבב 30 דקות, כולל חימום קצר. נא להגיע למגרש בזמן.</li>
-      <li>ניצחון = נקודה אחת. בשוויון בנקודות: הפרש משחקונים, ואז המפגש הישיר.</li>
+      <li>ניצחון = נקודה. בשוויון בנקודות: הפרש משחקונים, ואז המפגש הישיר.</li>
       <li>בעיות ושאלות: ניר זבולוני בלבד 😉</li>
     </ul>
   </section>
 </main>
 
 <script src="data.js"></script>
+<script src="tournament.js"></script>
 <script>
-  const START = '17:00';      // first league round
-  const SLOT = 30;            // minutes per game
-  const KO_BREAK = 15;        // pause before the knockout stage
-
-  const DATA = window.TOURNAMENT;
-
+  const K = window.TourneyKit, T = K.T;
   const $ = (id) => document.getElementById(id);
-  const toMin = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
-  const fmt = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-  const tag = (t) => el('span', `tag ${t}`, t === 'A' ? 'בית A' : 'בית B');
+  const tag = (h) => el('span', `tag ${h}`, `בית ${h}`);
+  const houseOf = (p) => (T.A.includes(p) ? 'A' : 'B');
 
-  const roundTime = (r) => fmt(toMin(START) + r * SLOT);
-  const koStart = toMin(START) + DATA.rounds.length * SLOT + KO_BREAK;
+  let results = {}, picked = '';
 
-  for (const t of ['A', 'B']) $(`list-${t}`).append(...DATA[t].map((p) => el('li', null, p)));
+  $('sub').textContent = `יום ראשון, 8.11.2026 · קניון רננים, קומה 5 (על הגג) · מתחילים ב-${T.start}`;
+
   const pick = $('pick');
-  for (const t of ['A', 'B']) {
+  for (const h of ['A', 'B']) {
     const g = document.createElement('optgroup');
-    g.label = t === 'A' ? 'בית A' : 'בית B';
-    g.append(...DATA[t].map((p) => new Option(p, p)));
+    g.label = `בית ${h}`;
+    g.append(...T[h].map((p) => new Option(p, p)));
     pick.append(g);
   }
 
-  const gameEls = [];
-  DATA.rounds.forEach((games, r) => {
-    const box = el('div', 'round');
-    const head = el('div', 'round-head');
-    head.append(el('span', 'time', roundTime(r)), el('b', null, `סבב ${r + 1}`));
-    const grid = el('div', 'games');
-    games.forEach(([t, x, y], c) => {
-      const g = el('div', 'game');
-      const top = el('div', 'top');
-      top.append(el('span', null, `מגרש ${c + 1}`), tag(t));
-      const tx = el('div', 'team', x), ty = el('div', 'team', y);
-      g.append(top, tx, el('div', 'vs', 'נגד'), ty);
-      g.dataset.teams = JSON.stringify([x, y]);
-      gameEls.push({ g, x, y, tx, ty });
-      grid.append(g);
-    });
-    const playing = new Set(games.flatMap(([, x, y]) => [x, y]));
-    const resting = [...DATA.A, ...DATA.B].filter((p) => !playing.has(p));
-    box.append(head, grid, el('p', 'rest-line', `נחים בסבב: ${resting.join(' · ')}`));
-    $('rounds').append(box);
-  });
-
-  const ko = [['רבע גמר', 0], ['חצי גמר', 1], ['גמר 🏆 ומשחק על מקום 3', 2]];
-  for (const [name, i] of ko) {
-    const slot = el('div', 'slot');
-    slot.append(el('span', 'time', fmt(koStart + i * SLOT)), el('b', null, name));
-    $('ko').append(slot);
+  function teamRow(name, s, idx, isMe) {
+    const row = el('div', 'team');
+    if (s) row.classList.add(s[idx] > s[1 - idx] ? 'won' : 'lost');
+    if (isMe) row.classList.add('me');
+    const n = el('span', null, name || '');
+    row.append(n, el('span', 's', s ? s[idx] : ''));
+    return row;
   }
-  $('ko').append(el('p', 'muted', `סיום משוער: ${fmt(koStart + 3 * SLOT)}`));
 
-  function applyPick(p) {
-    document.body.classList.toggle('filtering', !!p);
-    for (const { g, x, y, tx, ty } of gameEls) {
-      const hit = p && (x === p || y === p);
-      g.classList.toggle('hl', !!hit);
-      tx.classList.toggle('me', x === p);
-      ty.classList.toggle('me', y === p);
+  function gameCard(top, x, y, s, labelX, labelY) {
+    const g = el('div', 'game');
+    g.append(top);
+    const tx = teamRow(x, s, 0, x && x === picked), ty = teamRow(y, s, 1, y && y === picked);
+    if (!x) tx.firstChild.replaceWith(el('span', 'tbd', labelX));
+    if (!y) ty.firstChild.replaceWith(el('span', 'tbd', labelY));
+    g.append(tx, el('div', 'vs', s ? '' : 'נגד'), ty);
+    if (picked && (x === picked || y === picked)) g.classList.add('hl');
+    return g;
+  }
+
+  function renderStandings() {
+    const box = $('standings');
+    box.replaceChildren();
+    for (const h of ['A', 'B']) {
+      const { rows } = K.standings(h, results);
+      const wrap = el('div');
+      const title = el('h3');
+      title.append(tag(h), el('span', 'muted', `עולים ${K.QUALIFY[h]}`));
+      const table = el('table');
+      const head = el('tr');
+      for (const [t, c] of [['#', ''], ['זוג', 'l'], ['מש׳', ''], ['נצ׳', ''], ['הפ׳', ''], ['משחקונים', ''], ['הפרש', ''], ['נק׳', '']]) head.append(el('th', c, t));
+      table.append(head);
+      rows.forEach((r) => {
+        const tr = el('tr');
+        if (r.pos <= K.QUALIFY[h]) tr.classList.add('q');
+        if (r.pos === K.QUALIFY[h] + 1) tr.classList.add('cut');
+        if (r.pair === picked) tr.classList.add('me');
+        tr.append(el('td', 'pos', r.pos), el('td', 'l', r.pair), el('td', null, r.played), el('td', null, r.w), el('td', null, r.l),
+          el('td', null, `${r.gf}:${r.ga}`), el('td', null, r.diff > 0 ? `+${r.diff}` : r.diff), el('td', 'pts', r.pts));
+        table.append(tr);
+      });
+      wrap.append(title, table);
+      box.append(wrap);
     }
+    box.append(el('p', 'legend', 'בירוק: מקומות שעולים לרבע הגמר. מש׳ = משחקים, נצ׳ = ניצחונות, הפ׳ = הפסדים.'));
+  }
+
+  function renderRounds() {
+    const box = $('rounds');
+    box.replaceChildren();
+    T.rounds.forEach((_, r) => {
+      const round = el('div', 'round');
+      const head = el('div', 'round-head');
+      head.append(el('span', 'time', K.fmt(K.roundStart(r))), el('b', null, `סבב ${r + 1}`));
+      const grid = el('div', 'games');
+      const list = K.games.filter((g) => g.round === r);
+      for (const g of list) {
+        const top = el('div', 'top');
+        top.append(el('span', null, `מגרש ${g.court}`), tag(g.house));
+        grid.append(gameCard(top, g.x, g.y, K.score(results, g.id)));
+      }
+      const playing = new Set(list.flatMap((g) => [g.x, g.y]));
+      const resting = [...T.A, ...T.B].filter((p) => !playing.has(p));
+      round.append(head, grid, el('p', 'rest-line', `נחים בסבב: ${resting.join(' · ')}`));
+      box.append(round);
+    });
+  }
+
+  function renderBracket() {
+    const b = K.bracket(results), box = $('bracket');
+    box.replaceChildren();
+    K.KO_STAGES.forEach((stageName, stage) => {
+      const round = el('div', 'round');
+      const head = el('div', 'round-head');
+      head.append(el('span', 'time', K.fmt(K.koStart(stage))), el('b', null, stageName));
+      const grid = el('div', 'games');
+      for (const k of K.KO.filter((k) => k.stage === stage)) {
+        const g = b[k.id];
+        const top = el('div', 'top');
+        top.append(el('span', null, `מגרש ${k.court} · ${k.name}`), el('span', null, k.side ? `צד ${k.side}` : ''));
+        grid.append(gameCard(top, g.x.pair, g.y.pair, K.score(results, k.id), g.x.label, g.y.label));
+      }
+      round.append(head, grid);
+      box.append(round);
+    });
+  }
+
+  function renderMine() {
     const mine = $('mine');
     mine.replaceChildren();
-    mine.hidden = !p;
-    if (!p) return;
-    DATA.rounds.forEach((games, r) => {
-      const game = games.findIndex(([, x, y]) => x === p || y === p);
+    mine.hidden = !picked;
+    document.body.classList.toggle('filtering', !!picked);
+    if (!picked) return;
+    T.rounds.forEach((_, r) => {
+      const g = K.games.find((g) => g.round === r && (g.x === picked || g.y === picked));
       const row = el('div');
-      row.append(el('b', 'time', roundTime(r)));
-      if (game === -1) row.append(el('span', 'rest', 'מנוחה 😴'));
+      row.append(el('b', 'time', K.fmt(K.roundStart(r))));
+      if (!g) row.append(el('span', 'rest', 'מנוחה 😴'));
       else {
-        const [, x, y] = games[game];
-        row.append(el('span', null, `מגרש ${game + 1} · נגד ${x === p ? y : x}`));
+        const meFirst = g.x === picked, s = K.score(results, g.id);
+        row.append(el('span', null, `מגרש ${g.court} · נגד ${meFirst ? g.y : g.x}`));
+        if (s) {
+          const [mine2, theirs] = meFirst ? s : [s[1], s[0]];
+          row.append(el('span', 'res', `${mine2}:${theirs} ${mine2 > theirs ? '✅' : '❌'}`));
+        }
       }
       mine.append(row);
     });
   }
+
+  function render() {
+    renderStandings();
+    renderRounds();
+    renderBracket();
+    renderMine();
+  }
+
   pick.addEventListener('change', () => {
-    applyPick(pick.value);
-    try { localStorage.setItem('myPair', pick.value); } catch {}
+    picked = pick.value;
+    try { localStorage.setItem('myPair', picked); } catch {}
+    render();
   });
   try {
     const saved = localStorage.getItem('myPair');
-    if (saved && [...DATA.A, ...DATA.B].includes(saved)) { pick.value = saved; applyPick(saved); }
+    if (saved && [...T.A, ...T.B].includes(saved)) { pick.value = saved; picked = saved; }
   } catch {}
+
+  render();
+
+  async function refresh() {
+    try {
+      results = await K.fetchResults();
+      $('live').classList.remove('off');
+      $('live-text').textContent = `תוצאות מתעדכנות אוטומטית · עודכן ב-${new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}`;
+      render();
+    } catch {
+      $('live').classList.add('off');
+      $('live-text').textContent = 'לא הצלחנו לטעון תוצאות. ננסה שוב בעוד רגע.';
+    }
+  }
+  refresh();
+  setInterval(refresh, 30000);
 </script>
 </body>
 </html>

@@ -117,6 +117,9 @@ function doGet(e) {
   if (p.action === 'register') result = register_(p);
   else if (p.action === 'rankinfo') result = rankInfo_(p.t);
   else if (p.action === 'rank') result = rankSubmit_(p.t, p.order);
+  else if (p.action === 'results') result = { ok: true, results: readResults_() };
+  else if (p.action === 'login') result = checkPw_(p.pw) ? { ok: true } : { ok: false, error: 'bad_password' };
+  else if (p.action === 'save') result = saveResult_(p);
   else result = { ok: true, count: getSheet_().getLastRow() - 1, max: MAX_PLAYERS };
   if (p.callback && /^[A-Za-z_$][\w$.]*$/.test(p.callback)) {
     return ContentService.createTextOutput(p.callback + '(' + JSON.stringify(result) + ')')
@@ -140,6 +143,8 @@ function onOpen() {
     .addItem('1. הוספת עמודת טיר', 'setupTiers')
     .addItem('2. יצירת קישורי דירוג לטיר 1', 'makeRankLinks')
     .addItem('3. חישוב זוגות', 'computePairs')
+    .addSeparator()
+    .addItem('הגדרת סיסמת ניהול לתוצאות', 'setAdminPassword')
     .addToUi();
 }
 
@@ -420,4 +425,83 @@ function hungarian_(a) {
   var assign = [];
   for (j = 1; j <= n; j++) assign[p[j] - 1] = j - 1;
   return assign;
+}
+
+/* ===================== תוצאות משחקים ===================== */
+// Everyone can read results; only someone with the admin password can save.
+// The password lives in Script Properties (menu: הגדרת סיסמת ניהול), never in the code.
+
+var RESULTS_SHEET_NAME = 'תוצאות';
+var RESULT_HEADERS = ['משחק', 'משחקונים זוג 1', 'משחקונים זוג 2', 'זוג 1 (ידני)', 'זוג 2 (ידני)', 'עודכן'];
+
+function setAdminPassword() {
+  var ui = SpreadsheetApp.getUi();
+  var res = ui.prompt('סיסמת ניהול', 'הקלידו סיסמה לעמוד עדכון התוצאות (לפחות 4 תווים):', ui.ButtonSet.OK_CANCEL);
+  if (res.getSelectedButton() !== ui.Button.OK) return;
+  var pw = res.getResponseText().trim();
+  if (pw.length < 4) { ui.alert('הסיסמה קצרה מדי.'); return; }
+  PropertiesService.getScriptProperties().setProperty('ADMIN_PASSWORD', pw);
+  ui.alert('הסיסמה נשמרה.');
+}
+
+function checkPw_(pw) {
+  var real = PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD');
+  return !!real && String(pw || '') === real;
+}
+
+function getResultsSheet_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(RESULTS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(RESULTS_SHEET_NAME);
+    sheet.setRightToLeft(true);
+    sheet.getRange(1, 1, 1, RESULT_HEADERS.length).setValues([RESULT_HEADERS]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function readResults_() {
+  var sheet = getResultsSheet_();
+  var n = sheet.getLastRow() - 1;
+  var out = {};
+  if (n < 1) return out;
+  sheet.getRange(2, 1, n, 5).getValues().forEach(function (r) {
+    var id = String(r[0] || '').trim();
+    if (!id) return;
+    out[id] = { a: r[1] === '' ? '' : Number(r[1]), b: r[2] === '' ? '' : Number(r[2]), p1: String(r[3] || ''), p2: String(r[4] || '') };
+  });
+  return out;
+}
+
+function scoreValue_(v) {
+  var s = String(v == null ? '' : v).trim();
+  if (s === '') return '';
+  var n = Number(s);
+  return Math.floor(n) === n && n >= 0 && n <= 99 ? n : null;
+}
+
+function saveResult_(p) {
+  if (!checkPw_(p.pw)) return { ok: false, error: 'bad_password' };
+  var id = String(p.id || '').trim();
+  if (!/^(R\d{1,2}C\d{1,2}|QF[1-4]|SF[12]|F|P3)$/.test(id)) return { ok: false, error: 'bad_id' };
+  var a = scoreValue_(p.a), b = scoreValue_(p.b);
+  if (a === null || b === null) return { ok: false, error: 'bad_score' };
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var sheet = getResultsSheet_();
+    var n = sheet.getLastRow() - 1;
+    var row = null;
+    if (n > 0) {
+      var ids = sheet.getRange(2, 1, n, 1).getValues();
+      for (var i = 0; i < ids.length; i++) if (String(ids[i][0]) === id) { row = i + 2; break; }
+    }
+    if (!row) row = sheet.getLastRow() + 1;
+    sheet.getRange(row, 1, 1, 6).setValues([[id, a, b, clean_(p.p1), clean_(p.p2), new Date()]]);
+    return { ok: true, results: readResults_() };
+  } finally {
+    lock.releaseLock();
+  }
 }

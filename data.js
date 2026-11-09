@@ -1,6 +1,12 @@
-// Tournament data shared by index.html and schedule.html.
-// A/B = the pairs in each house; rounds = league games as [house, pair, pair], index = court - 1.
+// Tournament data shared by every page.
+// A/B = the pairs in each house; rounds = group games as [house, pair, pair],
+// position in the round = court - 1. Game ids are R<round>C<court> (see tournament.js).
+// start/slot/koBreak: first game time, minutes per slot, break before the knockout.
 window.TOURNAMENT = {
+ "scriptUrl": "https://script.google.com/macros/s/AKfycbyV2BAO9fzSXQZCQuPR39qiSjyKm1rH2XspfbrRVDG1QuXZqznqPJBjRzqghfKwr9OezQ/exec",
+ "start": "17:30",
+ "slot": 30,
+ "koBreak": 30,
  "A": [
   "ניר זבולוני + אלסנדרו כהן",
   "יהודה הלוי + אליאור שרייבר",
@@ -15,9 +21,9 @@ window.TOURNAMENT = {
  "B": [
   "גל השחר + מתנאל עזרזר",
   "נתן הרץ + מתן ברוס",
-  "דן מארק + יוסי ניסני",
+  "מור אלקוסר + יוסי ניסני",
   "מתן הורוביץ + בן שפיאלטר",
-  "אריק אלייני + אילן דמרי"
+  "אריק אלייני + אביחי גלצהלר"
  ],
  "rounds": [
   [
@@ -39,12 +45,12 @@ window.TOURNAMENT = {
    [
     "B",
     "גל השחר + מתנאל עזרזר",
-    "אריק אלייני + אילן דמרי"
+    "אריק אלייני + אביחי גלצהלר"
    ],
    [
     "B",
     "נתן הרץ + מתן ברוס",
-    "דן מארק + יוסי ניסני"
+    "מור אלקוסר + יוסי ניסני"
    ]
   ],
   [
@@ -70,8 +76,8 @@ window.TOURNAMENT = {
    ],
    [
     "B",
-    "דן מארק + יוסי ניסני",
-    "אריק אלייני + אילן דמרי"
+    "מור אלקוסר + יוסי ניסני",
+    "אריק אלייני + אביחי גלצהלר"
    ]
   ],
   [
@@ -115,12 +121,12 @@ window.TOURNAMENT = {
    [
     "B",
     "גל השחר + מתנאל עזרזר",
-    "דן מארק + יוסי ניסני"
+    "מור אלקוסר + יוסי ניסני"
    ],
    [
     "B",
     "נתן הרץ + מתן ברוס",
-    "אריק אלייני + אילן דמרי"
+    "אריק אלייני + אביחי גלצהלר"
    ]
   ],
   [
@@ -142,7 +148,7 @@ window.TOURNAMENT = {
    [
     "B",
     "מתן הורוביץ + בן שפיאלטר",
-    "אריק אלייני + אילן דמרי"
+    "אריק אלייני + אביחי גלצהלר"
    ]
   ],
   [
@@ -168,7 +174,7 @@ window.TOURNAMENT = {
    ],
    [
     "B",
-    "דן מארק + יוסי ניסני",
+    "מור אלקוסר + יוסי ניסני",
     "מתן הורוביץ + בן שפיאלטר"
    ]
   ]

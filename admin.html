@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ניהול תוצאות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: rgba(10, 14, 28, .7);
+    --card: rgba(16, 20, 36, .9);
+    --panel: rgba(6, 9, 20, .8);
+    --text: #f5f1ea;
+    --muted: #c9c1b6;
+    --line: rgba(255, 255, 255, .16);
+    --accent: #f07a1a;
+    --accent-text: #14100c;
+    --blue: #2d8cff;
+    --ok: #6fcf97;
+    --warn: #ffd166;
+    --err: #ff8a80;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0a0e1c; color: var(--text); font-family: "Rubik", system-ui, sans-serif; line-height: 1.45; }
+  main { max-width: 720px; margin: 0 auto; padding: 20px 12px 80px; display: grid; gap: 14px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  h1 { margin: 0 0 4px; font-size: 1.5rem; }
+  h2 { margin: 0 0 10px; font-size: 1.1rem; display: flex; gap: 10px; align-items: baseline; }
+  h2 .time { color: var(--accent); direction: ltr; }
+  .muted { color: var(--muted); }
+  a { color: #9cc8ff; }
+  input, select, button { font: inherit; }
+  .login { max-width: 360px; margin: 12vh auto 0; }
+  .login input { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); direction: ltr; text-align: right; }
+  .btn { width: 100%; margin-top: 12px; padding: 11px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-text); font-weight: 800; cursor: pointer; }
+  .msg { min-height: 1.4em; margin-top: 10px; color: var(--err); }
+
+  .bar { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; align-items: center; justify-content: space-between;
+    background: rgba(10, 14, 28, .95); border-bottom: 1px solid var(--line); padding: 10px 12px; margin: -20px -12px 0; }
+  .bar .state { font-size: .85rem; color: var(--muted); }
+  .bar a, .bar button { font-size: .85rem; background: none; border: 1px solid var(--line); color: var(--text); border-radius: 99px; padding: 4px 10px; cursor: pointer; text-decoration: none; }
+
+  .g { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+  .g:first-of-type { border-top: 0; }
+  .court { font-size: .75rem; color: var(--muted); text-align: center; line-height: 1.2; min-width: 3.2em; }
+  .court b { display: block; font-size: 1rem; color: var(--text); }
+  .names { display: grid; gap: 8px; font-size: .95rem; }
+  .names .n { min-height: 2.2rem; display: flex; align-items: center; }
+  .names .n.won { color: var(--ok); font-weight: 700; }
+  .scores { display: grid; gap: 8px; }
+  .scores input {
+    width: 3.2rem; height: 2.2rem; text-align: center; font-size: 1.15rem; font-weight: 800;
+    border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text);
+  }
+  .scores input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  .st { grid-column: 2 / 4; font-size: .8rem; min-height: 1.1em; color: var(--muted); }
+  .st.ok { color: var(--ok); }
+  .st.warn { color: var(--warn); }
+  .st.err { color: var(--err); }
+  .tag { font-size: .7rem; font-weight: 700; padding: 0 6px; border-radius: 99px; }
+  .tag.A { color: #ffb57a; border: 1px solid rgba(240, 122, 26, .6); }
+  .tag.B { color: #9cc8ff; border: 1px solid rgba(45, 140, 255, .6); }
+  .ov { display: flex; gap: 6px; align-items: center; font-size: .78rem; color: var(--muted); }
+  .ov select { flex: 1; min-width: 0; font-size: .8rem; padding: 3px 4px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  .tbd { color: var(--muted); font-style: italic; }
+
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  th { color: var(--muted); font-weight: 500; font-size: .75rem; }
+  td, th { padding: 4px 3px; text-align: center; }
+  td.l, th.l { text-align: right; }
+  tr.q td:first-child { color: var(--ok); font-weight: 800; }
+  .help { font-size: .85rem; color: var(--muted); margin: 0; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <section class="panel login" id="login">
+    <h1>ניהול תוצאות</h1>
+    <p class="muted" style="margin:0 0 14px">הזינו את סיסמת הניהול שהגדרתם בגיליון.</p>
+    <form id="login-form">
+      <input id="pw" type="password" autocomplete="current-password" placeholder="סיסמה">
+      <button class="btn" id="login-btn">כניסה</button>
+      <div class="msg" id="login-msg"></div>
+    </form>
+  </section>
+
+  <div id="app" hidden>
+    <div class="bar">
+      <span class="state" id="state">טוען…</span>
+      <span style="display:flex;gap:6px">
+        <a href="schedule.html" target="_blank">צפייה בלוח ↗</a>
+        <button type="button" id="logout">יציאה</button>
+      </span>
+    </div>
+    <p class="help" style="margin-top:14px">מקלידים משחקונים לכל זוג, והתוצאה נשמרת אוטומטית כשעוברים לשדה הבא. כדי למחוק תוצאה, מוחקים את שני המספרים. בנוקאאוט הזוגות נקבעים לפי הטבלה. אפשר לבחור זוג ידנית במקרה של שוויון או החלפה.</p>
+    <section class="panel" style="margin-top:14px">
+      <h2>טבלה</h2>
+      <div id="standings" style="display:grid;gap:14px"></div>
+    </section>
+    <div id="games" style="display:grid;gap:14px;margin-top:14px"></div>
+  </div>
+</main>
+
+<script src="data.js"></script>
+<script src="tournament.js"></script>
+<script>
+  const K = window.TourneyKit, T = K.T;
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const ALL = [...T.A, ...T.B];
+
+  let pw = '', results = {};
+  const rows = {};   // id -> { a, b, st, nx, ny, sx, sy, game }
+
+  // --- login ---
+  try { pw = sessionStorage.getItem('adminPw') || ''; } catch {}
+  $('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('login-msg').textContent = '';
+    $('login-btn').disabled = true;
+    try {
+      const r = await K.api({ action: 'login', pw: $('pw').value });
+      if (!r.ok) { $('login-msg').textContent = 'סיסמה שגויה.'; return; }
+      pw = $('pw').value;
+      try { sessionStorage.setItem('adminPw', pw); } catch {}
+      start();
+    } catch (err) {
+      $('login-msg').textContent = `אין חיבור לגיליון (${err.message}).`;
+    } finally {
+      $('login-btn').disabled = false;
+    }
+  });
+  $('logout').addEventListener('click', () => {
+    try { sessionStorage.removeItem('adminPw'); } catch {}
+    location.reload();
+  });
+
+  // --- score rules: group to 5 (4:4 -> tiebreak, so 5:4 max); knockout to 6 (5:5 -> 6:5) ---
+  function check(stage, a, b) {
+    if (a === '' && b === '') return ['', ''];
+    if (a === '' || b === '') return ['warn', 'חסר מספר אחד'];
+    if (a === b) return ['err', 'אין תיקו. בדקו את התוצאה'];
+    const top = stage === 'group' ? 5 : 6;
+    const [w, l] = a > b ? [a, b] : [b, a];
+    if (w !== top || l > top - 1) return ['warn', `נשמר, אבל תוצאה רגילה היא ${top} מול 0-${top - 1}`];
+    return ['ok', ''];
+  }
+
+  function scoreInput(val) {
+    const i = el('input');
+    i.type = 'number'; i.inputMode = 'numeric'; i.min = 0; i.max = 20;
+    i.value = val === '' || val == null ? '' : val;
+    return i;
+  }
+
+  function buildRow(id, stage, court, label, house) {
+    const r = results[id] || {};
+    const wrap = el('div', 'g');
+    const c = el('div', 'court');
+    c.append('מגרש', el('b', null, court));
+    if (house) { const t = el('span', `tag ${house}`, house); c.append(t); }
+    const names = el('div', 'names');
+    const nx = el('div', 'n'), ny = el('div', 'n');
+    names.append(nx, ny);
+    const scores = el('div', 'scores');
+    const a = scoreInput(r.a), b = scoreInput(r.b);
+    scores.append(a, b);
+    const st = el('div', 'st');
+    wrap.append(c, names, scores, st);
+    const row = { id, stage, a, b, st, nx, ny, label };
+    rows[id] = row;
+    for (const inp of [a, b]) inp.addEventListener('change', () => save(row));
+    return { wrap, row, names };
+  }
+
+  function overrideSelect(row, which) {
+    const s = el('select');
+    s.append(new Option('אוטומטי מהטבלה', ''));
+    for (const h of ['A', 'B']) {
+      const g = document.createElement('optgroup');
+      g.label = `בית ${h}`;
+      g.append(...T[h].map((p) => new Option(p, p)));
+      s.append(g);
+    }
+    s.value = (results[row.id] || {})[which] || '';
+    s.addEventListener('change', () => save(row));
+    return s;
+  }
+
+  async function save(row) {
+    const a = row.a.value.trim(), b = row.b.value.trim();
+    const params = { action: 'save', pw, id: row.id, a, b, p1: row.s1 ? row.s1.value : '', p2: row.s2 ? row.s2.value : '' };
+    row.st.className = 'st';
+    row.st.textContent = 'שומר…';
+    try {
+      const r = await K.api(params);
+      if (!r.ok) {
+        row.st.className = 'st err';
+        row.st.textContent = r.error === 'bad_password' ? 'הסיסמה כבר לא תקפה. צאו והתחברו מחדש.' : `שגיאה: ${r.error}`;
+        return;
+      }
+      results = r.results;
+      const [cls, msg] = check(row.stage, a === '' ? '' : Number(a), b === '' ? '' : Number(b));
+      row.st.className = `st ${cls === 'ok' || cls === '' ? 'ok' : cls}`;
+      row.st.textContent = `✓ נשמר${msg ? ` · ${msg}` : ''}`;
+      refreshDerived();
+    } catch (err) {
+      row.st.className = 'st err';
+      row.st.textContent = `לא נשמר (${err.message}). נסו שוב.`;
+    }
+  }
+
+  function setName(node, pair, label, s, idx) {
+    node.replaceChildren(pair ? pair : el('span', 'tbd', label));
+    node.classList.toggle('won', !!(s && s[idx] > s[1 - idx]));
+  }
+
+  // update everything that depends on results without touching inputs being typed in
+  function refreshDerived() {
+    const b = K.bracket(results);
+    for (const g of K.games) {
+      const r = rows[g.id], s = K.score(results, g.id);
+      setName(r.nx, g.x, '', s, 0);
+      setName(r.ny, g.y, '', s, 1);
+    }
+    for (const k of K.KO) {
+      const r = rows[k.id], s = K.score(results, k.id);
+      setName(r.nx, b[k.id].x.pair, b[k.id].x.label, s, 0);
+      setName(r.ny, b[k.id].y.pair, b[k.id].y.label, s, 1);
+    }
+    const box = $('standings');
+    box.replaceChildren();
+    for (const h of ['A', 'B']) {
+      const { rows: list, done } = K.standings(h, results);
+      const t = el('table');
+      const head = el('tr');
+      for (const [x, c] of [['#', ''], [`בית ${h}${done ? ' ✓' : ''}`, 'l'], ['מש׳', ''], ['נצ׳', ''], ['הפרש', ''], ['נק׳', '']]) head.append(el('th', c, x));
+      t.append(head);
+      for (const r of list) {
+        const tr = el('tr', r.pos <= K.QUALIFY[h] ? 'q' : '');
+        tr.append(el('td', null, r.pos), el('td', 'l', r.pair), el('td', null, r.played), el('td', null, r.w),
+          el('td', null, r.diff > 0 ? `+${r.diff}` : r.diff), el('td', null, r.pts));
+        t.append(tr);
+      }
+      box.append(t);
+    }
+    const entered = [...K.games, ...K.KO].filter((g) => K.score(results, g.id)).length;
+    $('state').textContent = `✓ מחובר · הוזנו ${entered}/${K.games.length + K.KO.length}`;
+  }
+
+  function buildAll() {
+    const box = $('games');
+    box.replaceChildren();
+    T.rounds.forEach((_, r) => {
+      const sec = el('section', 'panel');
+      const h = el('h2');
+      h.append(el('span', 'time', K.fmt(K.roundStart(r))), `סבב ${r + 1}`);
+      sec.append(h);
+      for (const g of K.games.filter((g) => g.round === r)) sec.append(buildRow(g.id, 'group', g.court, '', g.house).wrap);
+      box.append(sec);
+    });
+    K.KO_STAGES.forEach((name, stage) => {
+      const sec = el('section', 'panel');
+      const h = el('h2');
+      h.append(el('span', 'time', K.fmt(K.koStart(stage))), name);
+      sec.append(h);
+      for (const k of K.KO.filter((k) => k.stage === stage)) {
+        const { wrap, row } = buildRow(k.id, 'ko', k.court, k.name);
+        const ov = el('div', 'ov');
+        row.s1 = overrideSelect(row, 'p1');
+        row.s2 = overrideSelect(row, 'p2');
+        ov.append('ידני:', row.s1, row.s2);
+        ov.style.gridColumn = '1 / -1';
+        const title = el('div', 'muted', k.name);
+        title.style.cssText = 'grid-column:1/-1;font-size:.8rem';
+        wrap.prepend(title);
+        wrap.append(ov);
+        sec.append(wrap);
+      }
+      box.append(sec);
+    });
+    refreshDerived();
+  }
+
+  async function start() {
+    $('login').hidden = true;
+    $('app').hidden = false;
+    try {
+      results = await K.fetchResults();
+    } catch (err) {
+      $('state').textContent = `שגיאה בטעינה (${err.message})`;
+    }
+    buildAll();
+  }
+
+  if (pw) {
+    K.api({ action: 'login', pw }).then((r) => (r.ok ? start() : null)).catch(() => {});
+  }
+</script>
+</body>
+</html>
