@@ -23,10 +23,10 @@
     { id: 'QF4', stage: 0, court: 4, name: 'רבע גמר 4', side: 2, from: [['seed', 'A', 4], ['seed', 'A', 5]] },
     { id: 'SF1', stage: 1, court: 1, name: 'חצי גמר 1', side: 1, from: [['win', 'QF1'], ['win', 'QF2']] },
     { id: 'SF2', stage: 1, court: 2, name: 'חצי גמר 2', side: 2, from: [['win', 'QF3'], ['win', 'QF4']] },
+    { id: 'F', stage: 2, court: 1, name: 'גמר 🏆', from: [['win', 'SF1'], ['win', 'SF2']] },
     { id: 'P3', stage: 2, court: 2, name: 'מקום 3', from: [['lose', 'SF1'], ['lose', 'SF2']] },
-    { id: 'F', stage: 3, court: 1, name: 'גמר 🏆', from: [['win', 'SF1'], ['win', 'SF2']] },
   ].map((g) => ({ ...g, court: (T.koCourts && T.koCourts[g.id]) || g.court, time: fmt(koStart(g.stage)) }));
-  const KO_STAGES = ['רבע גמר', 'חצי גמר', 'מקום 3', 'גמר 🏆'];
+  const KO_STAGES = ['רבע גמר', 'חצי גמר', 'גמר ומקום 3'];
   const QUALIFY = { A: 6, B: 2 };
 
   const num = (v) => (v === '' || v == null || isNaN(Number(v)) ? null : Number(v));
