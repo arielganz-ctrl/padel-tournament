@@ -8,6 +8,10 @@ window.TOURNAMENT = {
  "start": "17:30",
  "slot": 30,
  "koBreak": 30,
+ "notes": [
+  {"time": "16:45", "title": "🙏 מנחה", "text": "השקיעה ב-16:46. חשוב להתחיל בזמן."},
+  {"time": "20:30", "title": "🍕 הפסקה: פיצות וערבית", "text": ""}
+ ],
  "groupCourts": [
   7,
   8,

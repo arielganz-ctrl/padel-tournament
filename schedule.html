@@ -79,6 +79,9 @@
 
   /* games */
   .round + .round { margin-top: 18px; }
+  .round.note { background: rgba(255,255,255,.07); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .round.note .round-head { margin: 0; flex-wrap: wrap; }
+  .round.note .note-text { color: var(--muted); font-size: .92rem; }
   .round-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
   .round-head .time { font-size: 1.25rem; font-weight: 800; color: var(--accent); direction: ltr; }
   .games { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -242,6 +245,18 @@
       round.append(head, grid, el('p', 'rest-line', `נחים בסבב: ${resting.join(' · ')}`));
       box.append(round);
     });
+    // fixed program items (prayer, break) placed by time between the rounds
+    const toMin = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+    for (const n of (T.notes || [])) {
+      const item = el('div', 'round note');
+      const head = el('div', 'round-head');
+      head.append(el('span', 'time', n.time), el('b', null, n.title));
+      if (n.text) head.append(el('span', 'note-text', n.text));
+      item.append(head);
+      const rounds = [...box.querySelectorAll('.round:not(.note)')];
+      const r = T.rounds.findIndex((_, i) => K.roundStart(i) >= toMin(n.time));
+      box.insertBefore(item, r < 0 ? null : rounds[r]);
+    }
   }
 
   function renderBracket() {
