@@ -105,8 +105,10 @@
   </div>
 </main>
 
-<script src="data.js"></script>
-<script src="tournament.js"></script>
+<script>
+  // always load the latest pairs, schedule and courts (GitHub Pages caches files for 10 minutes)
+  document.write(['data.js', 'tournament.js'].map((f) => `<script src="${f}?v=${Date.now()}"><\/script>`).join(''));
+</script>
 <script>
   const K = window.TourneyKit, T = K.T;
   const $ = (id) => document.getElementById(id);
